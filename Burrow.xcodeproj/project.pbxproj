@@ -1,0 +1,810 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FA88BD752F85800E00690D80 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA88BD742F85800E00690D80 /* NetworkExtension.framework */; };
+		FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA88BD832F85805D00690D80 /* WireGuardKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FA1E6B472F8572E600F6F863 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA1E6B312F8572E500F6F863 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA1E6B382F8572E500F6F863;
+			remoteInfo = Burrow;
+		};
+		FA1E6B512F8572E600F6F863 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA1E6B312F8572E500F6F863 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA1E6B382F8572E500F6F863;
+			remoteInfo = Burrow;
+		};
+		FA88BD7B2F85800E00690D80 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA1E6B312F8572E500F6F863 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FA88BD712F85800E00690D80;
+			remoteInfo = BurrowTunnel;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FA88BD822F85800E00690D80 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FA1E6B392F8572E500F6F863 /* Burrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Burrow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA1E6B462F8572E600F6F863 /* BurrowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BurrowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA1E6B502F8572E600F6F863 /* BurrowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BurrowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA88BD722F85800E00690D80 /* BurrowTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BurrowTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA88BD742F85800E00690D80 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FA88BD7E2F85800E00690D80 /* Exceptions for "BurrowTunnel" folder in "BurrowTunnel" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FA88BD712F85800E00690D80 /* BurrowTunnel */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		FA1E6B3B2F8572E500F6F863 /* Burrow */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Burrow;
+			sourceTree = "<group>";
+		};
+		FA1E6B492F8572E600F6F863 /* BurrowTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BurrowTests;
+			sourceTree = "<group>";
+		};
+		FA1E6B532F8572E600F6F863 /* BurrowUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BurrowUITests;
+			sourceTree = "<group>";
+		};
+		FA88BD762F85800E00690D80 /* BurrowTunnel */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FA88BD7E2F85800E00690D80 /* Exceptions for "BurrowTunnel" folder in "BurrowTunnel" target */,
+			);
+			path = BurrowTunnel;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FA1E6B362F8572E500F6F863 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B432F8572E600F6F863 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B4D2F8572E600F6F863 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA88BD6F2F85800E00690D80 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */,
+				FA88BD752F85800E00690D80 /* NetworkExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FA1E6B302F8572E500F6F863 = {
+			isa = PBXGroup;
+			children = (
+				FA1E6B3B2F8572E500F6F863 /* Burrow */,
+				FA1E6B492F8572E600F6F863 /* BurrowTests */,
+				FA1E6B532F8572E600F6F863 /* BurrowUITests */,
+				FA88BD762F85800E00690D80 /* BurrowTunnel */,
+				FA88BD732F85800E00690D80 /* Frameworks */,
+				FA1E6B3A2F8572E500F6F863 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FA1E6B3A2F8572E500F6F863 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA1E6B392F8572E500F6F863 /* Burrow.app */,
+				FA1E6B462F8572E600F6F863 /* BurrowTests.xctest */,
+				FA1E6B502F8572E600F6F863 /* BurrowUITests.xctest */,
+				FA88BD722F85800E00690D80 /* BurrowTunnel.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FA88BD732F85800E00690D80 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FA88BD742F85800E00690D80 /* NetworkExtension.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FA1E6B382F8572E500F6F863 /* Burrow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA1E6B5A2F8572E600F6F863 /* Build configuration list for PBXNativeTarget "Burrow" */;
+			buildPhases = (
+				FA1E6B352F8572E500F6F863 /* Sources */,
+				FA1E6B362F8572E500F6F863 /* Frameworks */,
+				FA1E6B372F8572E500F6F863 /* Resources */,
+				FA88BD822F85800E00690D80 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA88BD7C2F85800E00690D80 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FA1E6B3B2F8572E500F6F863 /* Burrow */,
+			);
+			name = Burrow;
+			packageProductDependencies = (
+			);
+			productName = Burrow;
+			productReference = FA1E6B392F8572E500F6F863 /* Burrow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FA1E6B452F8572E600F6F863 /* BurrowTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA1E6B5D2F8572E600F6F863 /* Build configuration list for PBXNativeTarget "BurrowTests" */;
+			buildPhases = (
+				FA1E6B422F8572E600F6F863 /* Sources */,
+				FA1E6B432F8572E600F6F863 /* Frameworks */,
+				FA1E6B442F8572E600F6F863 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA1E6B482F8572E600F6F863 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FA1E6B492F8572E600F6F863 /* BurrowTests */,
+			);
+			name = BurrowTests;
+			packageProductDependencies = (
+			);
+			productName = BurrowTests;
+			productReference = FA1E6B462F8572E600F6F863 /* BurrowTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FA1E6B4F2F8572E600F6F863 /* BurrowUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA1E6B602F8572E600F6F863 /* Build configuration list for PBXNativeTarget "BurrowUITests" */;
+			buildPhases = (
+				FA1E6B4C2F8572E600F6F863 /* Sources */,
+				FA1E6B4D2F8572E600F6F863 /* Frameworks */,
+				FA1E6B4E2F8572E600F6F863 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FA1E6B522F8572E600F6F863 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FA1E6B532F8572E600F6F863 /* BurrowUITests */,
+			);
+			name = BurrowUITests;
+			packageProductDependencies = (
+			);
+			productName = BurrowUITests;
+			productReference = FA1E6B502F8572E600F6F863 /* BurrowUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FA88BD712F85800E00690D80 /* BurrowTunnel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FA88BD7F2F85800E00690D80 /* Build configuration list for PBXNativeTarget "BurrowTunnel" */;
+			buildPhases = (
+				FA88BD862F85846F00690D80 /* ShellScript */,
+				FA88BD6E2F85800E00690D80 /* Sources */,
+				FA88BD6F2F85800E00690D80 /* Frameworks */,
+				FA88BD702F85800E00690D80 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FA88BD762F85800E00690D80 /* BurrowTunnel */,
+			);
+			name = BurrowTunnel;
+			packageProductDependencies = (
+				FA88BD832F85805D00690D80 /* WireGuardKit */,
+			);
+			productName = BurrowTunnel;
+			productReference = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FA1E6B312F8572E500F6F863 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					FA1E6B382F8572E500F6F863 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					FA1E6B452F8572E600F6F863 = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = FA1E6B382F8572E500F6F863;
+					};
+					FA1E6B4F2F8572E600F6F863 = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = FA1E6B382F8572E500F6F863;
+					};
+					FA88BD712F85800E00690D80 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = FA1E6B342F8572E500F6F863 /* Build configuration list for PBXProject "Burrow" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FA1E6B302F8572E500F6F863;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FA1E6B3A2F8572E500F6F863 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FA1E6B382F8572E500F6F863 /* Burrow */,
+				FA1E6B452F8572E600F6F863 /* BurrowTests */,
+				FA1E6B4F2F8572E600F6F863 /* BurrowUITests */,
+				FA88BD712F85800E00690D80 /* BurrowTunnel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FA1E6B372F8572E500F6F863 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B442F8572E600F6F863 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B4E2F8572E600F6F863 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA88BD702F85800E00690D80 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FA88BD862F85846F00690D80 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# Build WireGuard Go library (wg-go + maybenot)\nWG_GO_DIR=\"${BUILD_DIR%Build/*}SourcePackages/checkouts/wireguard-apple/Sources/WireGuardKitGo\"\n\nif [ ! -f \"${BUILT_PRODUCTS_DIR}/libwg-go.a\" ]; then\n    echo \"Building libwg-go.a...\"\n    export PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"\n    /usr/bin/make -C \"$WG_GO_DIR\" ARCHS=\"${ARCHS}\" PLATFORM_NAME=\"${PLATFORM_NAME}\" CONFIGURATION_BUILD_DIR=\"${BUILT_PRODUCTS_DIR}\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FA1E6B352F8572E500F6F863 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B422F8572E600F6F863 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA1E6B4C2F8572E600F6F863 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA88BD6E2F85800E00690D80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FA1E6B482F8572E600F6F863 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA1E6B382F8572E500F6F863 /* Burrow */;
+			targetProxy = FA1E6B472F8572E600F6F863 /* PBXContainerItemProxy */;
+		};
+		FA1E6B522F8572E600F6F863 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA1E6B382F8572E500F6F863 /* Burrow */;
+			targetProxy = FA1E6B512F8572E600F6F863 /* PBXContainerItemProxy */;
+		};
+		FA88BD7C2F85800E00690D80 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FA88BD712F85800E00690D80 /* BurrowTunnel */;
+			targetProxy = FA88BD7B2F85800E00690D80 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FA1E6B582F8572E600F6F863 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FA1E6B592F8572E600F6F863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		FA1E6B5B2F8572E600F6F863 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Burrow/Burrow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FA1E6B5C2F8572E600F6F863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Burrow/Burrow.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FA1E6B5E2F8572E600F6F863 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.BurrowTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Burrow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Burrow";
+			};
+			name = Debug;
+		};
+		FA1E6B5F2F8572E600F6F863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.BurrowTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Burrow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Burrow";
+			};
+			name = Release;
+		};
+		FA1E6B612F8572E600F6F863 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.BurrowUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Burrow;
+			};
+			name = Debug;
+		};
+		FA1E6B622F8572E600F6F863 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.BurrowUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Burrow;
+			};
+			name = Release;
+		};
+		FA88BD802F85800E00690D80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BurrowTunnel/BurrowTunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BurrowTunnel/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BurrowTunnel;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow.BurrowTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FA88BD812F85800E00690D80 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BurrowTunnel/BurrowTunnel.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BurrowTunnel/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BurrowTunnel;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow.BurrowTunnel;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FA1E6B342F8572E500F6F863 /* Build configuration list for PBXProject "Burrow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA1E6B582F8572E600F6F863 /* Debug */,
+				FA1E6B592F8572E600F6F863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA1E6B5A2F8572E600F6F863 /* Build configuration list for PBXNativeTarget "Burrow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA1E6B5B2F8572E600F6F863 /* Debug */,
+				FA1E6B5C2F8572E600F6F863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA1E6B5D2F8572E600F6F863 /* Build configuration list for PBXNativeTarget "BurrowTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA1E6B5E2F8572E600F6F863 /* Debug */,
+				FA1E6B5F2F8572E600F6F863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA1E6B602F8572E600F6F863 /* Build configuration list for PBXNativeTarget "BurrowUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA1E6B612F8572E600F6F863 /* Debug */,
+				FA1E6B622F8572E600F6F863 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FA88BD7F2F85800E00690D80 /* Build configuration list for PBXNativeTarget "BurrowTunnel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FA88BD802F85800E00690D80 /* Debug */,
+				FA88BD812F85800E00690D80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mullvad/wireguard-apple";
+			requirement = {
+				branch = "mullvad-master";
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FA88BD832F85805D00690D80 /* WireGuardKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */;
+			productName = WireGuardKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = FA1E6B312F8572E500F6F863 /* Project object */;
+}
