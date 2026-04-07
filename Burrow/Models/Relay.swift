@@ -30,4 +30,10 @@ struct Relay: Sendable, Codable, Equatable, Identifiable {
     let weight: Int
 
     var id: String { hostname }
+
+    /// Only decode the fields we need, ignore extras from the API.
+    enum CodingKeys: String, CodingKey {
+        case hostname, location, active, owned, provider
+        case ipv4AddrIn, ipv6AddrIn, publicKey, weight
+    }
 }

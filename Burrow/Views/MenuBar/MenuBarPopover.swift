@@ -125,7 +125,7 @@ struct MenuBarPopover: View {
 
                 Spacer()
 
-                Text("\(city.relays.filter(\.active).count)")
+                Text("\(city.activeRelayCount)")
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .monospacedDigit()

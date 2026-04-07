@@ -44,7 +44,13 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
 
             let isoFormatter = ISO8601DateFormatter()
             isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            guard let expiry = isoFormatter.date(from: tokenResponse.expiry) else {
+            // Try with fractional seconds first, then without
+            let expiry = isoFormatter.date(from: tokenResponse.expiry) ?? {
+                let fallback = ISO8601DateFormatter()
+                fallback.formatOptions = [.withInternetDateTime]
+                return fallback.date(from: tokenResponse.expiry)
+            }()
+            guard let expiry else {
                 throw MullvadAPIError.decodingError(
                     underlying: DecodingError.dataCorrupted(
                         .init(codingPath: [], debugDescription: "Invalid expiry date format")
@@ -123,6 +129,55 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         }
 
         return try decodeResponse(RelayList.self, from: data)
+    }
+
+    func listDevices(token: String) async throws -> [Device] {
+        let url = baseURL.appendingPathComponent("accounts/v1/devices")
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await performRequest(request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw MullvadAPIError.networkError(underlying: URLError(.badServerResponse))
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            return try decodeResponse([Device].self, from: data)
+        case 401:
+            throw MullvadAPIError.unauthorized
+        default:
+            throw MullvadAPIError.unexpectedStatus(
+                code: httpResponse.statusCode,
+                body: String(data: data, encoding: .utf8)
+            )
+        }
+    }
+
+    func removeDevice(token: String, deviceID: String) async throws {
+        let url = baseURL.appendingPathComponent("accounts/v1/devices/\(deviceID)")
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await performRequest(request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw MullvadAPIError.networkError(underlying: URLError(.badServerResponse))
+        }
+
+        switch httpResponse.statusCode {
+        case 200, 204:
+            return
+        case 401:
+            throw MullvadAPIError.unauthorized
+        default:
+            throw MullvadAPIError.unexpectedStatus(
+                code: httpResponse.statusCode,
+                body: String(data: data, encoding: .utf8)
+            )
+        }
     }
 
     // MARK: - Private Helpers

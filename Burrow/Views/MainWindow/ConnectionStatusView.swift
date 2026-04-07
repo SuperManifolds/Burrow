@@ -14,6 +14,8 @@ struct ConnectionStatusView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(Color.connectionStatus(connectionViewModel.status))
                 .symbolEffect(.pulse, isActive: connectionViewModel.status == .connecting)
+                .contentTransition(.symbolEffect(.replace))
+                .accessibilityLabel(connectionViewModel.status.displayText)
 
             // Status text
             VStack(spacing: 4) {
@@ -26,6 +28,7 @@ struct ConnectionStatusView: View {
                         .font(.caption)
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
+                        .accessibilityLabel("Connected for \(connectionViewModel.formattedDuration)")
                 }
 
                 if let relay = connectionViewModel.connectedRelay {
@@ -55,7 +58,13 @@ struct ConnectionStatusView: View {
                 !connectionViewModel.status.isActive && serverListViewModel.selectedRelay == nil
             )
 
-            if !connectionViewModel.status.isActive && serverListViewModel.selectedRelay == nil {
+            if let error = connectionViewModel.error {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            } else if !connectionViewModel.status.isActive && serverListViewModel.selectedRelay == nil {
                 Text("Select a server from the sidebar")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
@@ -65,6 +74,7 @@ struct ConnectionStatusView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
+        .animation(.easeInOut(duration: 0.3), value: connectionViewModel.status)
     }
 
     // MARK: - Helpers

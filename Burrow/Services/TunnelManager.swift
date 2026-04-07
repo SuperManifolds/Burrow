@@ -22,10 +22,18 @@ final class TunnelManager: ObservableObject {
     private var statusObserver: NSObjectProtocol?
 
     /// The bundle identifier for the Network Extension target.
-    private let tunnelBundleIdentifier = "com.burrow.vpn.tunnel"
+    private let tunnelBundleIdentifier = "io.sorlie.Burrow.BurrowTunnel"
 
     /// The app group used to share data between the app and extension.
     private let appGroupIdentifier = "group.com.burrow.vpn"
+
+    /// Read the diagnostic log from the tunnel extension.
+    func readTunnelLog() -> String? {
+        guard let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
+            .appendingPathComponent("tunnel.log") else { return nil }
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
 
     // MARK: - Initialization
 
@@ -44,13 +52,16 @@ final class TunnelManager: ObservableObject {
     /// Load or create the tunnel provider manager.
     func loadTunnelManager() async throws {
         let managers = try await NETunnelProviderManager.loadAllFromPreferences()
+        print("[Burrow TunnelManager] Found \(managers.count) existing managers")
 
         if let existing = managers.first(where: {
             ($0.protocolConfiguration as? NETunnelProviderProtocol)?
                 .providerBundleIdentifier == tunnelBundleIdentifier
         }) {
+            print("[Burrow TunnelManager] Reusing existing manager")
             tunnelManager = existing
         } else {
+            print("[Burrow TunnelManager] Creating new manager for \(tunnelBundleIdentifier)")
             tunnelManager = NETunnelProviderManager()
         }
     }
@@ -65,22 +76,23 @@ final class TunnelManager: ObservableObject {
         to relay: Relay,
         with device: Device,
         privateKey: Data,
-        port: Int = 51820
+        port: Int = 51820,
+        dns: String = "10.64.0.1"
     ) async throws {
         guard let manager = tunnelManager else {
             try await loadTunnelManager()
-            try await connect(to: relay, with: device, privateKey: privateKey, port: port)
+            try await connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns)
             return
         }
 
         // Configure the tunnel provider with structured parameters
         let protocolConfig = NETunnelProviderProtocol()
         protocolConfig.providerBundleIdentifier = tunnelBundleIdentifier
-        protocolConfig.serverAddress = "\(relay.ipv4AddrIn):\(port)"
+        protocolConfig.serverAddress = relay.ipv4AddrIn
         protocolConfig.providerConfiguration = [
             "privateKey": privateKey.base64EncodedString(),
             "addresses": "\(device.ipv4Address), \(device.ipv6Address)",
-            "dns": "10.64.0.1",
+            "dns": dns,
             "peerPublicKey": relay.publicKey,
             "peerEndpoint": "\(relay.ipv4AddrIn):\(port)",
             "peerAllowedIPs": "0.0.0.0/0, ::/0"
@@ -91,11 +103,19 @@ final class TunnelManager: ObservableObject {
         manager.isEnabled = true
 
         // Save and start
+        print("[Burrow TunnelManager] Saving preferences...")
         try await manager.saveToPreferences()
+        print("[Burrow TunnelManager] Loading preferences...")
         try await manager.loadFromPreferences()
 
-        let session = manager.connection as? NETunnelProviderSession
-        try session?.startTunnel(options: nil)
+        guard let session = manager.connection as? NETunnelProviderSession else {
+            print("[Burrow TunnelManager] ERROR: connection is not NETunnelProviderSession, got: \(type(of: manager.connection))")
+            throw TunnelError.invalidSession
+        }
+
+        print("[Burrow TunnelManager] Starting tunnel...")
+        try session.startTunnel(options: nil)
+        print("[Burrow TunnelManager] startTunnel called successfully")
 
         connectedRelay = relay
         status = .connecting
@@ -123,6 +143,17 @@ final class TunnelManager: ObservableObject {
             }
             Task { @MainActor in
                 self.updateStatus(from: connection.status)
+            }
+        }
+    }
+
+    enum TunnelError: LocalizedError {
+        case invalidSession
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidSession:
+                return "Failed to create tunnel session."
             }
         }
     }

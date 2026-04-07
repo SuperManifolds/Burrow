@@ -10,11 +10,13 @@ final class ConnectionViewModel: ObservableObject {
     @Published private(set) var status: ConnectionStatus = .disconnected
     @Published private(set) var connectedRelay: Relay?
     @Published private(set) var connectionDuration: TimeInterval = 0
+    @Published private(set) var error: String?
 
     // MARK: - Dependencies
 
     private let tunnelManager: TunnelManager
     private let accountViewModel: AccountViewModel
+    var settingsViewModel: SettingsViewModel?
     private var durationTimer: Timer?
 
     // MARK: - Initialization
@@ -37,16 +39,29 @@ final class ConnectionViewModel: ObservableObject {
 
     /// Connect to a specific relay.
     func connect(to relay: Relay) async {
-        guard let device = accountViewModel.device,
-              let privateKey = accountViewModel.privateKey() else {
+        error = nil
+
+        guard let device = accountViewModel.device else {
+            error = "No device registered. Try logging out and back in."
+            print("[Burrow] Connect failed: no device")
+            return
+        }
+
+        guard let privateKey = accountViewModel.privateKey() else {
+            error = "Missing private key. Try logging out and back in."
+            print("[Burrow] Connect failed: no private key")
             return
         }
 
         do {
-            try await tunnelManager.connect(to: relay, with: device, privateKey: privateKey)
+            let port = settingsViewModel?.effectivePort ?? 51820
+            let dns = settingsViewModel?.effectiveDNS ?? "10.64.0.1"
+            print("[Burrow] Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port))")
+            try await tunnelManager.connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns)
             startDurationTimer()
         } catch {
-            // Error handling will be driven by tunnelManager.status
+            self.error = error.localizedDescription
+            print("[Burrow] Connect error: \(error)")
         }
     }
 

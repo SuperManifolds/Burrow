@@ -17,4 +17,15 @@ protocol APIClientProtocol: Sendable {
     /// Fetch the complete list of available WireGuard relays.
     /// - Returns: The full relay list including locations and server details.
     func fetchRelayList() async throws -> RelayList
+
+    /// List all devices registered to the account.
+    /// - Parameter token: A valid access token.
+    /// - Returns: Array of registered devices.
+    func listDevices(token: String) async throws -> [Device]
+
+    /// Remove a device from the account.
+    /// - Parameters:
+    ///   - token: A valid access token.
+    ///   - deviceID: The ID of the device to remove.
+    func removeDevice(token: String, deviceID: String) async throws
 }

@@ -24,6 +24,10 @@ struct RelayList: Sendable, Codable {
 
     /// WireGuard-specific relay data.
     let wireguard: WireGuardRelays
+
+    enum CodingKeys: String, CodingKey {
+        case locations, wireguard
+    }
 }
 
 /// WireGuard relay configuration from the relay list API.
@@ -39,6 +43,10 @@ struct WireGuardRelays: Sendable, Codable {
 
     /// Default IPv6 gateway for WireGuard tunnels.
     let ipv6Gateway: String
+
+    enum CodingKeys: String, CodingKey {
+        case relays, portRanges, ipv4Gateway, ipv6Gateway
+    }
 }
 
 // MARK: - Grouped Display Models
@@ -48,12 +56,15 @@ struct RelayCountryGroup: Sendable, Identifiable {
     let countryCode: String
     let countryName: String
     let cities: [RelayCityGroup]
+    let activeRelayCount: Int
 
     var id: String { countryCode }
 
-    /// Total number of active relays across all cities.
-    var activeRelayCount: Int {
-        cities.reduce(0) { $0 + $1.relays.filter(\.active).count }
+    init(countryCode: String, countryName: String, cities: [RelayCityGroup]) {
+        self.countryCode = countryCode
+        self.countryName = countryName
+        self.cities = cities
+        self.activeRelayCount = cities.reduce(0) { $0 + $1.activeRelayCount }
     }
 }
 
@@ -62,6 +73,14 @@ struct RelayCityGroup: Sendable, Identifiable {
     let cityName: String
     let location: RelayLocation
     let relays: [Relay]
+    let activeRelayCount: Int
 
     var id: String { "\(location.country)-\(cityName)" }
+
+    init(cityName: String, location: RelayLocation, relays: [Relay]) {
+        self.cityName = cityName
+        self.location = location
+        self.relays = relays
+        self.activeRelayCount = relays.filter(\.active).count
+    }
 }

@@ -5,10 +5,8 @@ struct CountrySectionView: View {
     let country: RelayCountryGroup
     let onSelectCity: (RelayCityGroup) -> Void
 
-    @State private var isExpanded = false
-
     var body: some View {
-        DisclosureGroup(isExpanded: $isExpanded) {
+        DisclosureGroup {
             ForEach(country.cities) { city in
                 Button {
                     onSelectCity(city)
@@ -19,7 +17,7 @@ struct CountrySectionView: View {
 
                         Spacer()
 
-                        Text("\(city.relays.filter(\.active).count)")
+                        Text("\(city.activeRelayCount)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
@@ -27,7 +25,7 @@ struct CountrySectionView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .padding(.leading, 8)
+                .accessibilityLabel("\(city.cityName), \(city.activeRelayCount) servers")
             }
         } label: {
             HStack(spacing: 8) {

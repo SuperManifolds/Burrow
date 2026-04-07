@@ -10,6 +10,7 @@ struct BurrowApp: App {
     @StateObject private var tunnelManager = TunnelManager()
     @StateObject private var serverListViewModel = ServerListViewModel()
     @StateObject private var connectionStore = ConnectionViewModelStore()
+    @StateObject private var settingsStore = SettingsViewModelStore()
 
     // MARK: - Body
 
@@ -17,13 +18,22 @@ struct BurrowApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(accountViewModel)
+                .environmentObject(tunnelManager)
                 .environmentObject(connectionStore.resolve(
                     tunnelManager: tunnelManager,
                     accountViewModel: accountViewModel
                 ))
                 .environmentObject(serverListViewModel)
+                .environmentObject(settingsStore.resolve(accountViewModel: accountViewModel))
         }
         .defaultSize(width: 800, height: 600)
+
+        Settings {
+            SettingsView(
+                settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel),
+                accountViewModel: accountViewModel
+            )
+        }
     }
 }
 
@@ -41,6 +51,19 @@ final class ConnectionViewModelStore: ObservableObject {
             tunnelManager: tunnelManager,
             accountViewModel: accountViewModel
         )
+        viewModel = vm
+        return vm
+    }
+}
+
+/// Holds a lazily-created SettingsViewModel so it can be a @StateObject.
+@MainActor
+final class SettingsViewModelStore: ObservableObject {
+    private var viewModel: SettingsViewModel?
+
+    func resolve(accountViewModel: AccountViewModel) -> SettingsViewModel {
+        if let existing = viewModel { return existing }
+        let vm = SettingsViewModel(accountViewModel: accountViewModel)
         viewModel = vm
         return vm
     }
