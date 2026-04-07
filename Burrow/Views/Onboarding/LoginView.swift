@@ -12,9 +12,10 @@ struct LoginView: View {
 
             // App icon and title
             VStack(spacing: 12) {
-                Image(systemName: "lock.shield.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.tint)
+                Image(.icon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 96, height: 96)
 
                 Text("Burrow")
                     .font(.largeTitle)
@@ -74,11 +75,13 @@ struct LoginView: View {
 
             Spacer()
 
-            // Footer
-            Text("Find your account number at mullvad.net")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 16)
+            HStack(spacing: 4) {
+                Text("Don't have an account?")
+                    .foregroundStyle(.tertiary)
+                Link("Sign up", destination: URL(string: "https://mullvad.net/en/account/create")!)
+            }
+            .font(.caption2)
+            .padding(.bottom, 16)
         }
         .frame(minWidth: 380, minHeight: 420)
         .onAppear { isFieldFocused = true }
