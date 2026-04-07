@@ -33,34 +33,6 @@ struct ContentView: View {
                 serverListViewModel: serverListViewModel
             )
         }
-        .navigationTitle("Burrow")
-        .toolbar {
-            ToolbarItem(placement: .automatic) {
-                Menu {
-                    Button("Print Tunnel Log") {
-                        if let log = tunnelManager.readTunnelLog() {
-                            print("=== TUNNEL LOG ===")
-                            print(log)
-                            print("=== END TUNNEL LOG ===")
-                        } else {
-                            print("[Burrow] No tunnel log available")
-                        }
-                    }
-                    Divider()
-                    Button("Log Out") {
-                        connectionViewModel.settingsViewModel = nil
-                        accountViewModel.logout()
-                    }
-                    Divider()
-                    Button("Quit Burrow") {
-                        NSApplication.shared.terminate(nil)
-                    }
-                } label: {
-                    Image(systemName: "person.circle")
-                }
-                .accessibilityLabel("Account menu")
-            }
-        }
         .onAppear {
             connectionViewModel.settingsViewModel = settingsViewModel
         }

@@ -26,6 +26,7 @@ struct BurrowApp: App {
                 .environmentObject(serverListViewModel)
                 .environmentObject(settingsStore.resolve(accountViewModel: accountViewModel))
         }
+        .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 800, height: 600)
 
         Settings {

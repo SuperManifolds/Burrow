@@ -4,6 +4,8 @@ import SwiftUI
 struct ServerListView: View {
     @ObservedObject var serverListViewModel: ServerListViewModel
     @ObservedObject var connectionViewModel: ConnectionViewModel
+    @EnvironmentObject var accountViewModel: AccountViewModel
+    @EnvironmentObject var tunnelManager: TunnelManager
 
     @State private var expandedCountries: Set<String> = []
 
@@ -40,14 +42,47 @@ struct ServerListView: View {
                         }
                     }
                 }
+                .searchable(text: $serverListViewModel.searchText, placement: .sidebar, prompt: "Search countries or cities")
             }
         }
-        .searchable(text: $serverListViewModel.searchText, prompt: "Search countries or cities")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                accountMenu
+            }
+        }
         .task {
             if serverListViewModel.countries.isEmpty {
                 await serverListViewModel.loadRelays()
             }
         }
+    }
+
+    // MARK: - Account Menu
+
+    private var accountMenu: some View {
+        Menu {
+            Button("Print Tunnel Log") {
+                if let log = tunnelManager.readTunnelLog() {
+                    print("=== TUNNEL LOG ===")
+                    print(log)
+                    print("=== END TUNNEL LOG ===")
+                } else {
+                    print("[Burrow] No tunnel log available")
+                }
+            }
+            Divider()
+            Button("Log Out") {
+                connectionViewModel.settingsViewModel = nil
+                accountViewModel.logout()
+            }
+            Divider()
+            Button("Quit Burrow") {
+                NSApplication.shared.terminate(nil)
+            }
+        } label: {
+            Image(systemName: "person.circle")
+        }
+        .accessibilityLabel("Account menu")
     }
 
     // MARK: - Rows
