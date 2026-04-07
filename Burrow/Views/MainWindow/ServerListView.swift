@@ -35,7 +35,7 @@ struct ServerListView: View {
                     ForEach(serverListViewModel.filteredCountries) { country in
                         countryRow(country)
 
-                        if expandedCountries.contains(country.id) {
+                        if expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty {
                             ForEach(country.cities) { city in
                                 cityRow(country: country, city: city)
                             }
@@ -85,6 +85,20 @@ struct ServerListView: View {
         .accessibilityLabel("Account menu")
     }
 
+    // MARK: - Helpers
+
+    private func pingColor(_ ms: Int) -> Color {
+        switch ms {
+        case ..<25:     Color(.systemGreen)
+        case ..<50:     Color(.systemMint)
+        case ..<80:     Color(.systemTeal)
+        case ..<120:    Color(.systemYellow)
+        case ..<180:    Color(.systemOrange)
+        case ..<250:    Color(.systemPink)
+        default:        Color(.systemRed)
+        }
+    }
+
     // MARK: - Rows
 
     private func countryRow(_ country: RelayCountryGroup) -> some View {
@@ -98,7 +112,7 @@ struct ServerListView: View {
             }
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: expandedCountries.contains(country.id) ? "chevron.down" : "chevron.right")
+                Image(systemName: (expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty) ? "chevron.down" : "chevron.right")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .frame(width: 10)
@@ -110,7 +124,7 @@ struct ServerListView: View {
 
                 Spacer()
 
-                Text("\(country.activeRelayCount)")
+                Text("\(country.cities.count)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
@@ -134,14 +148,19 @@ struct ServerListView: View {
 
                 Spacer()
 
-                Text("\(city.activeRelayCount)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+                if let ping = serverListViewModel.pings[city.id] {
+                    Text("\(ping) ms")
+                        .font(.caption)
+                        .foregroundStyle(pingColor(ping))
+                        .monospacedDigit()
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                }
             }
             .padding(.leading, 26)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(city.cityName), \(city.activeRelayCount) servers")
+        .accessibilityLabel("\(city.cityName)")
     }
 }
