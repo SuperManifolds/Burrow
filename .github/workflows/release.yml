@@ -111,6 +111,12 @@ jobs:
           mkdir -p $RUNNER_TEMP/export
           cp -R "$RUNNER_TEMP/Burrow.xcarchive/Products/Applications/Burrow.app" "$APP_PATH"
 
+          # Embed provisioning profiles
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/Burrow_DeveloperID.provisionprofile \
+            "$APP_PATH/Contents/embedded.provisionprofile"
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/BurrowTunnel_DeveloperID.provisionprofile \
+            "$APP_PATH/Contents/PlugIns/BurrowTunnel.appex/Contents/embedded.provisionprofile"
+
           xattr -cr "$APP_PATH"
 
           # Sign inside-out: Network Extension first
