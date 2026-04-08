@@ -97,6 +97,7 @@ struct ConnectionStatusView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
             // Action buttons
@@ -115,6 +116,7 @@ struct ConnectionStatusView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .hoverScale()
+                .transition(.scale.combined(with: .opacity))
             }
 
             Button {
@@ -152,6 +154,7 @@ struct ConnectionStatusView: View {
                 Text("Select a server from the sidebar")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
+                    .transition(.opacity)
             } else if !connectionViewModel.status.isActive,
                       let relay = serverListViewModel.selectedRelay {
                 VStack(spacing: 2) {
@@ -164,6 +167,7 @@ struct ConnectionStatusView: View {
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
             Spacer()
@@ -177,6 +181,7 @@ struct ConnectionStatusView: View {
         .frame(maxWidth: .infinity)
         .padding()
         .animation(.spring(duration: 0.5, bounce: 0.2), value: connectionViewModel.status)
+        .animation(.spring(duration: 0.4, bounce: 0.15), value: serverListViewModel.selectedRelay?.hostname)
     }
 
     // MARK: - Connection Details Bar
