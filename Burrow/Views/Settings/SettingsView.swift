@@ -108,14 +108,32 @@ private struct DevicesSettingsTab: View {
                 Spacer()
             } else {
                 List {
-                    ForEach(settingsViewModel.devices) { device in
-                        DeviceRow(
-                            device: device,
-                            isCurrentDevice: device.id == accountViewModel.device?.id,
-                            onRemove: {
-                                Task { await settingsViewModel.removeDevice(device) }
+                    if let expiry = settingsViewModel.accountExpiry {
+                        Section {
+                            HStack {
+                                Text("Subscription")
+                                Spacer()
+                                if expiry > Date() {
+                                    Text("Expires \(expiry, style: .relative)")
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    Text("Expired")
+                                        .foregroundStyle(.red)
+                                }
                             }
-                        )
+                        }
+                    }
+
+                    Section("Devices") {
+                        ForEach(settingsViewModel.devices) { device in
+                            DeviceRow(
+                                device: device,
+                                isCurrentDevice: device.id == accountViewModel.device?.id,
+                                onRemove: {
+                                    Task { await settingsViewModel.removeDevice(device) }
+                                }
+                            )
+                        }
                     }
                 }
             }

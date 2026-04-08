@@ -201,6 +201,41 @@ final class MullvadAPIClient: VPNProvider, Sendable {
         }
     }
 
+    func fetchAccountExpiry(token: String) async throws -> Date {
+        let url = baseURL.appendingPathComponent("accounts/v1/accounts/me")
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await performRequest(request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            throw VPNProviderError.providerError(
+                message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
+            )
+        }
+
+        let account = try decodeResponse(AccountInfoResponse.self, from: data)
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let expiry = isoFormatter.date(from: account.expiry) ?? {
+            let fallback = ISO8601DateFormatter()
+            fallback.formatOptions = [.withInternetDateTime]
+            return fallback.date(from: account.expiry)
+        }()
+        guard let expiry else {
+            throw VPNProviderError.decodingError(
+                underlying: DecodingError.dataCorrupted(
+                    .init(codingPath: [], debugDescription: "Invalid expiry date format")
+                )
+            )
+        }
+        return expiry
+    }
+
     // MARK: - Private Helpers
 
     private func performRequest(_ request: URLRequest) async throws -> (Data, URLResponse) {
@@ -218,4 +253,9 @@ final class MullvadAPIClient: VPNProvider, Sendable {
             throw VPNProviderError.decodingError(underlying: error)
         }
     }
+}
+
+/// Raw account info response from `GET /accounts/v1`.
+private struct AccountInfoResponse: Sendable, Codable {
+    let expiry: String
 }

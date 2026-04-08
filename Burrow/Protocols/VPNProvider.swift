@@ -35,4 +35,7 @@ protocol VPNProvider: Sendable {
 
     /// Remove a device from the account.
     func removeDevice(token: String, deviceID: String) async throws
+
+    /// Fetch the subscription expiry date for the account.
+    func fetchAccountExpiry(token: String) async throws -> Date
 }

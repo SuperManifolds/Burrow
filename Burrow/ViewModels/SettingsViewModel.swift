@@ -39,6 +39,7 @@ final class SettingsViewModel: ObservableObject {
     @Published private(set) var devices: [Device] = []
     @Published private(set) var isLoadingDevices: Bool = false
     @Published private(set) var deviceError: String?
+    @Published private(set) var accountExpiry: Date?
 
     // MARK: - Dependencies
 
@@ -94,7 +95,10 @@ final class SettingsViewModel: ObservableObject {
         deviceError = nil
 
         do {
-            devices = try await provider.listDevices(token: token)
+            async let devicesFetch = provider.listDevices(token: token)
+            async let expiryFetch = provider.fetchAccountExpiry(token: token)
+            devices = try await devicesFetch
+            accountExpiry = try? await expiryFetch
         } catch {
             deviceError = error.localizedDescription
         }
