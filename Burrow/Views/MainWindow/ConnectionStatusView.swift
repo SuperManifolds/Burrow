@@ -278,11 +278,11 @@ struct ConnectionStatusView: View {
 
     private func latencyLabel(_ ms: Int) -> String {
         switch ms {
-            case ..<25: String(localized: "Excellent")
-            case ..<50: String(localized: "Great")
-            case ..<80: String(localized: "Good")
-            case ..<120: String(localized: "Fair")
-            case ..<180: String(localized: "Slow")
+            case ..<50: String(localized: "Excellent")
+            case ..<100: String(localized: "Great")
+            case ..<150: String(localized: "Good")
+            case ..<200: String(localized: "Fair")
+            case ..<300: String(localized: "Slow")
             default: String(localized: "Poor")
         }
     }
