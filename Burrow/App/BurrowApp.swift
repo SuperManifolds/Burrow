@@ -14,14 +14,18 @@ struct BurrowApp: App {
 
     // MARK: - Body
 
+    private var connectionViewModel: ConnectionViewModel {
+        connectionStore.resolve(
+            tunnelManager: tunnelManager,
+            accountViewModel: accountViewModel
+        )
+    }
+
     var body: some Scene {
-        WindowGroup {
+        Window("Burrow", id: "main") {
             ContentView()
                 .environmentObject(accountViewModel)
-                .environmentObject(connectionStore.resolve(
-                    tunnelManager: tunnelManager,
-                    accountViewModel: accountViewModel
-                ))
+                .environmentObject(connectionViewModel)
                 .environmentObject(serverListViewModel)
                 .environmentObject(settingsStore.resolve(accountViewModel: accountViewModel))
         }
@@ -33,6 +37,37 @@ struct BurrowApp: App {
                 settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel),
                 accountViewModel: accountViewModel
             )
+        }
+
+        MenuBarExtra {
+            if !isPreview {
+                MenuBarView(
+                    connectionViewModel: connectionViewModel,
+                    serverListViewModel: serverListViewModel,
+                    accountViewModel: accountViewModel
+                )
+            }
+        } label: {
+            if !isPreview {
+                Image(systemName: menuBarIcon)
+                    .symbolRenderingMode(.monochrome)
+            }
+        }
+        .menuBarExtraStyle(.window)
+    }
+
+    private var isPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
+    }
+
+    private var menuBarIcon: String {
+        switch connectionStore.resolve(
+            tunnelManager: tunnelManager,
+            accountViewModel: accountViewModel
+        ).status {
+            case .connected: "checkmark.shield.fill"
+            case .connecting, .disconnecting: "antenna.radiowaves.left.and.right"
+            case .disconnected: "shield.slash"
         }
     }
 }
