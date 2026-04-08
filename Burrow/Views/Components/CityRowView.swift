@@ -4,6 +4,8 @@ import SwiftUI
 struct CityRowView: View {
     let city: RelayCityGroup
     let ping: Int?
+    var isFavourite: Bool = false
+    var onToggleFavourite: (() -> Void)?
     let onSelect: () -> Void
 
     var body: some View {
@@ -11,6 +13,22 @@ struct CityRowView: View {
             onSelect()
         } label: {
             HStack {
+                if let onToggleFavourite {
+                    Button {
+                        onToggleFavourite()
+                    } label: {
+                        Image(systemName: isFavourite ? "star.fill" : "star")
+                            .font(.caption)
+                            .foregroundStyle(isFavourite ? .accent : .secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(
+                        isFavourite
+                            ? String(localized: "Remove from favourites")
+                            : String(localized: "Add to favourites")
+                    )
+                }
+
                 Text(city.cityName)
                     .foregroundStyle(.primary)
 
@@ -19,29 +37,17 @@ struct CityRowView: View {
                 if let ping {
                     Text("\(ping) ms")
                         .font(.caption)
-                        .foregroundStyle(pingColor(ping))
+                        .foregroundStyle(Color.ping(ping))
                         .monospacedDigit()
                 } else {
                     ProgressView()
                         .controlSize(.small)
                 }
             }
-            .padding(.leading, 26)
+            .padding(.leading, onToggleFavourite != nil ? 8 : 26)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(city.cityName)")
-    }
-
-    private func pingColor(_ ms: Int) -> Color {
-        switch ms {
-            case ..<25:     Color(.systemGreen)
-            case ..<50:     Color(.systemMint)
-            case ..<80:     Color(.systemTeal)
-            case ..<120:    Color(.systemYellow)
-            case ..<180:    Color(.systemOrange)
-            case ..<250:    Color(.systemPink)
-            default:        Color(.systemRed)
-        }
     }
 }
 
@@ -59,24 +65,28 @@ struct CityRowView: View {
             relays: []
         ),
         ping: 42,
+        isFavourite: false,
+        onToggleFavourite: {},
         onSelect: {}
     )
     .padding()
 }
 
-#Preview("Loading Ping") {
+#Preview("Favourited") {
     CityRowView(
         city: RelayCityGroup(
-            cityName: "Gothenburg",
+            cityName: "Stockholm",
             location: RelayLocation(
                 country: "Sweden",
-                city: "Gothenburg",
-                latitude: 57.71,
-                longitude: 11.97
+                city: "Stockholm",
+                latitude: 59.33,
+                longitude: 18.07
             ),
             relays: []
         ),
-        ping: nil,
+        ping: 12,
+        isFavourite: true,
+        onToggleFavourite: {},
         onSelect: {}
     )
     .padding()

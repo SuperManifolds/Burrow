@@ -13,6 +13,58 @@ final class ServerListViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var selectedRelay: Relay?
     @Published private(set) var pings: [String: Int] = [:]
+    @Published var favouriteCityIDs: Set<String> {
+        didSet { saveFavourites() }
+    }
+
+    // MARK: - Favourites
+
+    struct FavouriteCity {
+        let city: RelayCityGroup
+        let countryCode: String
+        /// Distinct ID to avoid collisions with city rows in the same List.
+        var favouriteID: String { "fav-\(city.id)" }
+    }
+
+    /// Favourite cities resolved from the current country list.
+    var favouriteCities: [FavouriteCity] {
+        guard !favouriteCityIDs.isEmpty else { return [] }
+        var results: [FavouriteCity] = []
+        for country in countries {
+            for city in country.cities where favouriteCityIDs.contains(city.id) {
+                results.append(FavouriteCity(city: city, countryCode: country.countryCode))
+            }
+        }
+        return results.sorted { $0.city.cityName < $1.city.cityName }
+    }
+
+    func isFavourite(_ city: RelayCityGroup) -> Bool {
+        favouriteCityIDs.contains(city.id)
+    }
+
+    func toggleFavourite(_ city: RelayCityGroup) {
+        if favouriteCityIDs.contains(city.id) {
+            favouriteCityIDs.remove(city.id)
+        } else {
+            favouriteCityIDs.insert(city.id)
+        }
+    }
+
+    private static let favouritesKey = "BurrowFavouriteCityIDs"
+
+    private func saveFavourites() {
+        UserDefaults.standard.set(
+            Array(favouriteCityIDs),
+            forKey: Self.favouritesKey
+        )
+    }
+
+    private static func loadFavourites() -> Set<String> {
+        let array = UserDefaults.standard.stringArray(
+            forKey: favouritesKey
+        ) ?? []
+        return Set(array)
+    }
 
     /// Countries filtered by the current search text.
     var filteredCountries: [RelayCountryGroup] {
@@ -47,6 +99,7 @@ final class ServerListViewModel: ObservableObject {
 
     init(apiClient: APIClientProtocol = MullvadAPIClient()) {
         self.relayService = RelayListService(apiClient: apiClient)
+        self.favouriteCityIDs = Self.loadFavourites()
     }
 
     // MARK: - Public API
@@ -88,11 +141,18 @@ final class ServerListViewModel: ObservableObject {
         }
         let service = RelayListService(apiClient: MullvadAPIClient())
         vm.countries = service.groupedRelays(from: relayList)
+        var sampleFavourites: Set<String> = []
         for country in vm.countries {
             for city in country.cities {
                 vm.pings[city.id] = Int.random(in: 10...200)
             }
+            // Pick the first city of the first two countries as favourites
+            if sampleFavourites.count < 3,
+               let city = country.cities.first {
+                sampleFavourites.insert(city.id)
+            }
         }
+        vm.favouriteCityIDs = sampleFavourites
         return vm
     }
     #endif

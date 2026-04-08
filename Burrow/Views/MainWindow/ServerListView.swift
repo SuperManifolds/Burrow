@@ -41,34 +41,65 @@ struct ServerListView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List {
-                    ForEach(serverListViewModel.filteredCountries) { country in
-                        CountryRowView(
-                            country: country,
-                            isExpanded: isExpanded(country)
-                        ) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                if expandedCountries.contains(country.id) {
-                                    expandedCountries.remove(country.id)
-                                } else {
-                                    expandedCountries.insert(country.id)
-                                }
+                    if !serverListViewModel.favouriteCities.isEmpty
+                        && serverListViewModel.searchText.isEmpty {
+                        Section {
+                            ForEach(
+                                serverListViewModel.favouriteCities,
+                                id: \.favouriteID
+                            ) { entry in
+                                FavouriteRowView(
+                                    city: entry.city,
+                                    countryCode: entry.countryCode,
+                                    ping: serverListViewModel.pings[entry.city.id],
+                                    onUnfavourite: {
+                                        serverListViewModel.toggleFavourite(entry.city)
+                                    },
+                                    onSelect: {
+                                        connectToCity(entry.city)
+                                    }
+                                )
                             }
+                        } header: {
+                            Text("Favourites")
                         }
+                    }
 
-                        if isExpanded(country) {
-                            ForEach(country.cities) { city in
-                                CityRowView(
-                                    city: city,
-                                    ping: serverListViewModel.pings[city.id]
-                                ) {
-                                    if let relay = serverListViewModel.selectRelay(in: city) {
-                                        serverListViewModel.selectedRelay = relay
-                                        Task {
-                                            await connectionViewModel.connect(to: relay)
-                                        }
+                    Section {
+                        ForEach(serverListViewModel.filteredCountries) { country in
+                            CountryRowView(
+                                country: country,
+                                isExpanded: isExpanded(country)
+                            ) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    if expandedCountries.contains(country.id) {
+                                        expandedCountries.remove(country.id)
+                                    } else {
+                                        expandedCountries.insert(country.id)
                                     }
                                 }
                             }
+
+                            if isExpanded(country) {
+                                ForEach(country.cities) { city in
+                                    CityRowView(
+                                        city: city,
+                                        ping: serverListViewModel.pings[city.id],
+                                        isFavourite: serverListViewModel.isFavourite(city),
+                                        onToggleFavourite: {
+                                            serverListViewModel.toggleFavourite(city)
+                                        },
+                                        onSelect: {
+                                            connectToCity(city)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    } header: {
+                        if !serverListViewModel.favouriteCities.isEmpty
+                            && serverListViewModel.searchText.isEmpty {
+                            Text("All Servers")
                         }
                     }
                 }
@@ -120,6 +151,15 @@ struct ServerListView: View {
     }
 
     // MARK: - Helpers
+
+    private func connectToCity(_ city: RelayCityGroup) {
+        if let relay = serverListViewModel.selectRelay(in: city) {
+            serverListViewModel.selectedRelay = relay
+            Task {
+                await connectionViewModel.connect(to: relay)
+            }
+        }
+    }
 
     private func isExpanded(_ country: RelayCountryGroup) -> Bool {
         expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty

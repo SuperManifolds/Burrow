@@ -12,4 +12,17 @@ extension ShapeStyle where Self == Color {
                 return Color(.systemGray)
         }
     }
+
+    /// Color reflecting ping latency quality.
+    static func ping(_ ms: Int) -> Color {
+        switch ms {
+            case ..<25:     Color(.systemGreen)
+            case ..<50:     Color(.systemMint)
+            case ..<80:     Color(.systemTeal)
+            case ..<120:    Color(.systemYellow)
+            case ..<180:    Color(.systemOrange)
+            case ..<250:    Color(.systemPink)
+            default:        Color(.systemRed)
+        }
+    }
 }
