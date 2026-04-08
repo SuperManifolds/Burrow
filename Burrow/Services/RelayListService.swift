@@ -62,7 +62,7 @@ actor RelayListService {
     /// Group relays by country and city for UI display.
     /// - Parameter relayList: The relay list to group.
     /// - Returns: Sorted array of country groups, each containing city groups.
-    func groupedRelays(from relayList: RelayList) -> [RelayCountryGroup] {
+    nonisolated func groupedRelays(from relayList: RelayList) -> [RelayCountryGroup] {
         // Build a mapping of location key → (location, relays)
         var cityMap: [String: (location: RelayLocation, relays: [Relay])] = [:]
 

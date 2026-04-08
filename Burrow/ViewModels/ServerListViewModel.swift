@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Network
+import os
 
 /// Manages the relay server list — fetching, grouping, searching, and selection.
 @MainActor
@@ -62,7 +63,7 @@ final class ServerListViewModel: ObservableObject {
 
         do {
             let relayList = try await relayService.fetchRelayList()
-            countries = await relayService.groupedRelays(from: relayList)
+            countries = relayService.groupedRelays(from: relayList)
             measurePings()
         } catch {
             self.error = error.localizedDescription
@@ -85,9 +86,9 @@ final class ServerListViewModel: ObservableObject {
             guard let relay = city.relays.first(where: \.active) else { continue }
             let cityID = city.id
 
-            Task.detached { [weak self] in
+            Task.detached {
                 let ms = await Self.measureTCPLatency(to: relay.ipv4AddrIn, port: 443)
-                await MainActor.run {
+                await MainActor.run { [weak self] in
                     self?.pings[cityID] = ms
                 }
             }
@@ -103,24 +104,27 @@ final class ServerListViewModel: ObservableObject {
             using: .tcp
         )
 
+        let resumed = OSAllocatedUnfairLock(initialState: false)
+
         return await withCheckedContinuation { (continuation: CheckedContinuation<Int?, Never>) in
             let start = DispatchTime.now()
-            var resumed = false
 
             connection.stateUpdateHandler = { state in
-                guard !resumed else { return }
+                let alreadyResumed = resumed.withLock { value -> Bool in
+                    if value { return true }
+                    value = true
+                    return false
+                }
+                guard !alreadyResumed else { return }
+
                 switch state {
                     case .ready, .failed, .waiting:
-                        resumed = true
                         let elapsed = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds
                         let ms = Int(elapsed / 1_000_000)
                         connection.cancel()
                         continuation.resume(returning: ms)
                     case .cancelled:
-                        if !resumed {
-                            resumed = true
-                            continuation.resume(returning: nil)
-                        }
+                        continuation.resume(returning: nil)
                     default:
                         break
                 }
@@ -130,8 +134,12 @@ final class ServerListViewModel: ObservableObject {
 
             // Timeout after 3 seconds
             DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                guard !resumed else { return }
-                resumed = true
+                let alreadyResumed = resumed.withLock { value -> Bool in
+                    if value { return true }
+                    value = true
+                    return false
+                }
+                guard !alreadyResumed else { return }
                 connection.cancel()
                 continuation.resume(returning: nil)
             }

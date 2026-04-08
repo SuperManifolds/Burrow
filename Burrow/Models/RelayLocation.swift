@@ -18,7 +18,7 @@ struct RelayLocation: Sendable, Codable, Equatable {
 // MARK: - API Response Structures
 
 /// Top-level relay list response from `GET /app/v1/relays`.
-struct RelayList: Sendable, Codable {
+struct RelayList: Sendable {
     /// Map of location keys (e.g. "us-nyc") to location metadata.
     let locations: [String: RelayLocation]
 
@@ -27,6 +27,22 @@ struct RelayList: Sendable, Codable {
 
     enum CodingKeys: String, CodingKey {
         case locations, wireguard
+    }
+}
+
+// MARK: - Codable (explicit nonisolated to avoid @MainActor inference)
+
+extension RelayList: Codable {
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.locations = try container.decode([String: RelayLocation].self, forKey: .locations)
+        self.wireguard = try container.decode(WireGuardRelays.self, forKey: .wireguard)
+    }
+
+    nonisolated func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(locations, forKey: .locations)
+        try container.encode(wireguard, forKey: .wireguard)
     }
 }
 
@@ -60,7 +76,7 @@ struct RelayCountryGroup: Sendable, Identifiable {
 
     var id: String { countryCode }
 
-    init(countryCode: String, countryName: String, cities: [RelayCityGroup]) {
+    nonisolated init(countryCode: String, countryName: String, cities: [RelayCityGroup]) {
         self.countryCode = countryCode
         self.countryName = countryName
         self.cities = cities
@@ -77,7 +93,7 @@ struct RelayCityGroup: Sendable, Identifiable {
 
     var id: String { "\(location.country)-\(cityName)" }
 
-    init(cityName: String, location: RelayLocation, relays: [Relay]) {
+    nonisolated init(cityName: String, location: RelayLocation, relays: [Relay]) {
         self.cityName = cityName
         self.location = location
         self.relays = relays
