@@ -90,3 +90,15 @@ struct ConnectionStatusView: View {
         }
     }
 }
+#if DEBUG
+#Preview("Disconnected") {
+    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: AccountViewModel())
+
+    ConnectionStatusView(
+        connectionViewModel: connectionVM,
+        serverListViewModel: ServerListViewModel()
+    )
+    .frame(width: 400, height: 400)
+}
+#endif
+

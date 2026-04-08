@@ -137,3 +137,16 @@ struct MenuBarPopover: View {
         .buttonStyle(.plain)
     }
 }
+
+#if DEBUG
+#Preview {
+    let accountVM = AccountViewModel()
+    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: accountVM)
+
+    MenuBarPopover(
+        connectionViewModel: connectionVM,
+        serverListViewModel: ServerListViewModel(),
+        accountViewModel: accountVM
+    )
+}
+#endif

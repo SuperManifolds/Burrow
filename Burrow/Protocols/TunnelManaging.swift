@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /// Abstraction for VPN tunnel lifecycle management.
@@ -9,8 +10,14 @@ protocol TunnelManaging: AnyObject {
     /// The current connection status of the tunnel.
     var status: ConnectionStatus { get }
 
+    /// Publisher for observing status changes.
+    var statusPublisher: Published<ConnectionStatus>.Publisher { get }
+
     /// The relay currently connected to, if any.
     var connectedRelay: Relay? { get }
+
+    /// Publisher for observing connected relay changes.
+    var connectedRelayPublisher: Published<Relay?>.Publisher { get }
 
     /// When the current connection was established.
     var connectedDate: Date? { get }
@@ -55,3 +62,42 @@ extension TunnelManaging {
         )
     }
 }
+
+// MARK: - Mock for Previews and Tests
+
+#if DEBUG
+@MainActor
+final class MockTunnelManager: TunnelManaging {
+    @Published private(set) var status: ConnectionStatus
+    @Published private(set) var connectedRelay: Relay?
+    @Published private(set) var connectedDate: Date?
+
+    var statusPublisher: Published<ConnectionStatus>.Publisher { $status }
+    var connectedRelayPublisher: Published<Relay?>.Publisher { $connectedRelay }
+
+    init(status: ConnectionStatus = .disconnected, connectedRelay: Relay? = nil) {
+        self.status = status
+        self.connectedRelay = connectedRelay
+        self.connectedDate = nil
+    }
+
+    func connect(
+        to relay: Relay,
+        with device: Device,
+        privateKey: Data,
+        port: Int,
+        dns: String
+    ) async throws {
+        status = .connecting
+        connectedRelay = relay
+    }
+
+    func disconnect() async {
+        status = .disconnected
+        connectedRelay = nil
+        connectedDate = nil
+    }
+
+    func readTunnelLog() -> String? { nil }
+}
+#endif

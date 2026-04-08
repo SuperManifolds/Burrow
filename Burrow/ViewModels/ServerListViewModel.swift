@@ -1,7 +1,5 @@
 import Combine
 import Foundation
-import Network
-import os
 
 /// Manages the relay server list — fetching, grouping, searching, and selection.
 @MainActor
@@ -14,8 +12,6 @@ final class ServerListViewModel: ObservableObject {
     @Published private(set) var error: String?
     @Published var searchText: String = ""
     @Published var selectedRelay: Relay?
-
-    /// Ping latency in ms per city ID.
     @Published private(set) var pings: [String: Int] = [:]
 
     /// Countries filtered by the current search text.
@@ -24,12 +20,10 @@ final class ServerListViewModel: ObservableObject {
         let query = searchText.lowercased()
 
         return countries.compactMap { country in
-            // Match country name
             if country.countryName.lowercased().contains(query) {
                 return country
             }
 
-            // Match city names within country
             let matchingCities = country.cities.filter {
                 $0.cityName.lowercased().contains(query)
             }
@@ -47,6 +41,7 @@ final class ServerListViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let relayService: RelayListService
+    private let pingService = PingService()
 
     // MARK: - Initialization
 
@@ -78,70 +73,19 @@ final class ServerListViewModel: ObservableObject {
         return selector.selectRelay(from: city.relays, in: nil)
     }
 
-    /// Measure ping to one relay per city concurrently.
-    func measurePings() {
-        let cities = countries.flatMap { $0.cities }
+    /// Measure ping to one relay per city.
+    private func measurePings() {
+        let targets: [(String, String)] = countries.flatMap { $0.cities }.compactMap { city in
+            guard let relay = city.relays.first(where: \.active) else { return nil }
+            return (city.id, relay.ipv4AddrIn)
+        }
 
-        for city in cities {
-            guard let relay = city.relays.first(where: \.active) else { continue }
-            let cityID = city.id
-
-            Task.detached {
-                let ms = await Self.measureTCPLatency(to: relay.ipv4AddrIn, port: 443)
-                await MainActor.run { [weak self] in
+        Task.detached { [pingService] in
+            let results = await pingService.measureAll(targets)
+            await MainActor.run { [weak self] in
+                for (cityID, ms) in results {
                     self?.pings[cityID] = ms
                 }
-            }
-        }
-    }
-
-    /// Measure TCP connection establishment time to estimate latency.
-    private static func measureTCPLatency(to host: String, port: UInt16) async -> Int? {
-        guard let nwPort = NWEndpoint.Port(rawValue: port) else { return nil }
-        let connection = NWConnection(
-            host: NWEndpoint.Host(host),
-            port: nwPort,
-            using: .tcp
-        )
-
-        let resumed = OSAllocatedUnfairLock(initialState: false)
-
-        return await withCheckedContinuation { (continuation: CheckedContinuation<Int?, Never>) in
-            let start = DispatchTime.now()
-
-            connection.stateUpdateHandler = { state in
-                let alreadyResumed = resumed.withLock { value -> Bool in
-                    if value { return true }
-                    value = true
-                    return false
-                }
-                guard !alreadyResumed else { return }
-
-                switch state {
-                    case .ready, .failed, .waiting:
-                        let elapsed = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds
-                        let ms = Int(elapsed / 1_000_000)
-                        connection.cancel()
-                        continuation.resume(returning: ms)
-                    case .cancelled:
-                        continuation.resume(returning: nil)
-                    default:
-                        break
-                }
-            }
-
-            connection.start(queue: .global(qos: .utility))
-
-            // Timeout after 3 seconds
-            DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
-                let alreadyResumed = resumed.withLock { value -> Bool in
-                    if value { return true }
-                    value = true
-                    return false
-                }
-                guard !alreadyResumed else { return }
-                connection.cancel()
-                continuation.resume(returning: nil)
             }
         }
     }

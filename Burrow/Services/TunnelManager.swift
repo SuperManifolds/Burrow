@@ -16,6 +16,9 @@ final class TunnelManager: ObservableObject, TunnelManaging {
     @Published private(set) var connectedRelay: Relay?
     @Published private(set) var connectedDate: Date?
 
+    var statusPublisher: Published<ConnectionStatus>.Publisher { $status }
+    var connectedRelayPublisher: Published<Relay?>.Publisher { $connectedRelay }
+
     // MARK: - Properties
 
     private var tunnelManager: NETunnelProviderManager?

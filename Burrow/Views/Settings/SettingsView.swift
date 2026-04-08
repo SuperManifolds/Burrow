@@ -119,6 +119,19 @@ private struct DevicesSettingsTab: View {
 
 // MARK: - Device Row
 
+#if DEBUG
+#Preview {
+    let accountVM = AccountViewModel()
+
+    SettingsView(
+        settingsViewModel: SettingsViewModel(accountViewModel: accountVM),
+        accountViewModel: accountVM
+    )
+}
+#endif
+
+// MARK: - Device Row
+
 private struct DeviceRow: View {
     let device: Device
     let isCurrentDevice: Bool

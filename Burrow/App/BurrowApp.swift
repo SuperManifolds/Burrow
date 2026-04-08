@@ -18,7 +18,6 @@ struct BurrowApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(accountViewModel)
-                .environmentObject(tunnelManager)
                 .environmentObject(connectionStore.resolve(
                     tunnelManager: tunnelManager,
                     accountViewModel: accountViewModel
@@ -44,7 +43,7 @@ final class ConnectionViewModelStore: ObservableObject {
     private var viewModel: ConnectionViewModel?
 
     func resolve(
-        tunnelManager: TunnelManager,
+        tunnelManager: any TunnelManaging,
         accountViewModel: AccountViewModel
     ) -> ConnectionViewModel {
         if let existing = viewModel { return existing }

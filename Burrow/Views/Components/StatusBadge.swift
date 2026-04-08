@@ -24,3 +24,13 @@ struct StatusBadge: View {
         .accessibilityLabel(String(localized: "VPN status: \(status.displayText)"))
     }
 }
+
+#Preview {
+    VStack(spacing: 12) {
+        StatusBadge(status: .disconnected)
+        StatusBadge(status: .connecting)
+        StatusBadge(status: .connected(since: .now))
+        StatusBadge(status: .disconnecting)
+    }
+    .padding()
+}

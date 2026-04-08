@@ -5,7 +5,6 @@ struct ServerListView: View {
     @ObservedObject var serverListViewModel: ServerListViewModel
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @EnvironmentObject var tunnelManager: TunnelManager
 
     @State private var expandedCountries: Set<String> = []
 
@@ -66,7 +65,7 @@ struct ServerListView: View {
     private var accountMenu: some View {
         Menu {
             Button("Print Tunnel Log") {
-                if let log = tunnelManager.readTunnelLog() {
+                if let log = connectionViewModel.readTunnelLog() {
                     print("=== TUNNEL LOG ===")
                     print(log)
                     print("=== END TUNNEL LOG ===")
@@ -172,3 +171,17 @@ struct ServerListView: View {
         .accessibilityLabel("\(city.cityName)")
     }
 }
+
+#if DEBUG
+#Preview {
+    let accountVM = AccountViewModel()
+    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: accountVM)
+
+    ServerListView(
+        serverListViewModel: ServerListViewModel(),
+        connectionViewModel: connectionVM
+    )
+    .environmentObject(accountVM)
+    .frame(width: 260, height: 500)
+}
+#endif

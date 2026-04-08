@@ -3,7 +3,6 @@ import SwiftUI
 /// Root view that shows either onboarding (login) or the main app interface.
 struct ContentView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
-    @EnvironmentObject var tunnelManager: TunnelManager
     @EnvironmentObject var connectionViewModel: ConnectionViewModel
     @EnvironmentObject var serverListViewModel: ServerListViewModel
     @EnvironmentObject var settingsViewModel: SettingsViewModel
@@ -38,3 +37,19 @@ struct ContentView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    let accountVM = AccountViewModel()
+    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: accountVM)
+    let serverListVM = ServerListViewModel()
+    let settingsVM = SettingsViewModel(accountViewModel: accountVM)
+
+    ContentView()
+        .environmentObject(accountVM)
+        .environmentObject(connectionVM)
+        .environmentObject(serverListVM)
+        .environmentObject(settingsVM)
+        .frame(width: 800, height: 600)
+}
+#endif

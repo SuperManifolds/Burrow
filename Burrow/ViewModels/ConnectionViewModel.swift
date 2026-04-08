@@ -14,23 +14,23 @@ final class ConnectionViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let tunnelManager: TunnelManager
+    private let tunnelManager: any TunnelManaging
     private let accountViewModel: AccountViewModel
     var settingsViewModel: SettingsViewModel?
     private var durationTimer: Timer?
 
     // MARK: - Initialization
 
-    init(tunnelManager: TunnelManager, accountViewModel: AccountViewModel) {
+    init(tunnelManager: any TunnelManaging, accountViewModel: AccountViewModel) {
         self.tunnelManager = tunnelManager
         self.accountViewModel = accountViewModel
 
         // Observe tunnel manager status changes
-        tunnelManager.$status
+        tunnelManager.statusPublisher
             .receive(on: RunLoop.main)
             .assign(to: &$status)
 
-        tunnelManager.$connectedRelay
+        tunnelManager.connectedRelayPublisher
             .receive(on: RunLoop.main)
             .assign(to: &$connectedRelay)
     }
@@ -70,6 +70,11 @@ final class ConnectionViewModel: ObservableObject {
         await tunnelManager.disconnect()
         stopDurationTimer()
         connectionDuration = 0
+    }
+
+    /// Read the diagnostic log from the tunnel extension.
+    func readTunnelLog() -> String? {
+        tunnelManager.readTunnelLog()
     }
 
     /// Toggle connection state for the given relay.
