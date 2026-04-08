@@ -70,7 +70,7 @@ struct ServerListView: View {
                                 country: country,
                                 isExpanded: isExpanded(country)
                             ) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
+                                withAnimation(.spring(duration: 0.3, bounce: 0.1)) {
                                     if expandedCountries.contains(country.id) {
                                         expandedCountries.remove(country.id)
                                     } else {

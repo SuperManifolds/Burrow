@@ -62,6 +62,7 @@ struct MenuBarView: View {
             Image(systemName: statusIcon)
                 .font(.title2)
                 .foregroundStyle(Color.connectionStatus(connectionViewModel.status))
+                .contentTransition(.symbolEffect(.replace))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(connectionViewModel.status.displayText)
@@ -150,6 +151,7 @@ struct MenuBarView: View {
         VStack(spacing: 2) {
             Button {
                 openWindow(id: "main")
+                NSApplication.shared.activate()
             } label: {
                 HStack {
                     Image(systemName: "macwindow")

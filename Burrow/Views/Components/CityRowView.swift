@@ -16,6 +16,8 @@ struct CityRowView: View {
                     Image(systemName: isFavourite ? "star.fill" : "star")
                         .font(.caption)
                         .foregroundStyle(isFavourite ? .accent : .secondary)
+                        .contentTransition(.symbolEffect(.replace))
+                        .animation(.spring(duration: 0.3, bounce: 0.4), value: isFavourite)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(
@@ -35,12 +37,15 @@ struct CityRowView: View {
                     .font(.caption)
                     .foregroundStyle(Color.ping(ping))
                     .monospacedDigit()
+                    .transition(.scale.combined(with: .opacity))
             } else {
                 ProgressView()
                     .controlSize(.small)
+                    .transition(.opacity)
             }
         }
         .padding(.leading, onToggleFavourite != nil ? 8 : 26)
+        .animation(.spring(duration: 0.3), value: ping)
         .accessibilityLabel("\(city.cityName)")
     }
 }

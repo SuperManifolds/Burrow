@@ -4,6 +4,7 @@ import SwiftUI
 struct ConnectionStatusView: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
+    @State private var iconScale: CGFloat = 1.0
 
     var body: some View {
         VStack(spacing: 24) {
@@ -15,7 +16,16 @@ struct ConnectionStatusView: View {
                 .foregroundStyle(Color.connectionStatus(connectionViewModel.status))
                 .symbolEffect(.pulse, isActive: connectionViewModel.status == .connecting)
                 .contentTransition(.symbolEffect(.replace))
+                .scaleEffect(iconScale)
                 .accessibilityLabel(connectionViewModel.status.displayText)
+                .onChange(of: connectionViewModel.status) {
+                    withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
+                        iconScale = 1.15
+                    }
+                    withAnimation(.spring(duration: 0.4, bounce: 0.3).delay(0.2)) {
+                        iconScale = 1.0
+                    }
+                }
 
             // Status text
             VStack(spacing: 6) {
@@ -28,6 +38,7 @@ struct ConnectionStatusView: View {
                         Text(locationText)
                             .font(.subheadline)
                             .fontWeight(.medium)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
 
                     if let relay = connectionViewModel.connectedRelay {
@@ -39,12 +50,18 @@ struct ConnectionStatusView: View {
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
 
                     // Duration badge
                     HStack(spacing: 5) {
                         Image(systemName: "clock")
                             .font(.caption2)
+                            .symbolEffect(
+                                .pulse,
+                                options: .speed(0.3),
+                                isActive: connectionViewModel.status.isActive
+                            )
                         Text(connectionViewModel.formattedDuration)
                             .font(.caption)
                             .fontWeight(.medium)
@@ -55,6 +72,7 @@ struct ConnectionStatusView: View {
                     .padding(.vertical, 4)
                     .background(.accent.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .transition(.scale.combined(with: .opacity))
                     .accessibilityLabel(
                         String(localized: "Connected for \(connectionViewModel.formattedDuration)")
                     )
@@ -96,6 +114,7 @@ struct ConnectionStatusView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .hoverScale()
             }
 
             Button {
@@ -116,6 +135,7 @@ struct ConnectionStatusView: View {
             .buttonStyle(.borderedProminent)
             .tint(connectionViewModel.status.isActive ? .red : .accentColor)
             .controlSize(.large)
+            .hoverScale()
             .disabled(
                 !connectionViewModel.status.isActive
                     && serverListViewModel.selectedRelay == nil
@@ -151,11 +171,12 @@ struct ConnectionStatusView: View {
             // Connection details bar (only when connected)
             if case .connected = connectionViewModel.status {
                 connectionDetailsBar
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .animation(.easeInOut(duration: 0.3), value: connectionViewModel.status)
+        .animation(.spring(duration: 0.5, bounce: 0.2), value: connectionViewModel.status)
     }
 
     // MARK: - Connection Details Bar

@@ -5,6 +5,7 @@ struct LoginView: View {
     @ObservedObject var accountViewModel: AccountViewModel
 
     @FocusState private var isFieldFocused: Bool
+    @State private var iconBreathing = false
 
     var body: some View {
         VStack(spacing: 32) {
@@ -16,12 +17,18 @@ struct LoginView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 96, height: 96)
+                    .scaleEffect(iconBreathing ? 1.03 : 1.0)
+                    .animation(
+                        .easeInOut(duration: 2.0).repeatForever(autoreverses: true),
+                        value: iconBreathing
+                    )
+                    .onAppear { iconBreathing = true }
 
                 Text("Burrow")
                     .font(.largeTitle)
                     .fontWeight(.bold)
 
-                Text("Enter your Mullvad account number")
+                Text("Enter your \(accountViewModel.provider.providerName) account number")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -115,9 +122,11 @@ struct LoginView: View {
                         if item.step == accountViewModel.loginStep {
                             ProgressView()
                                 .controlSize(.small)
+                                .transition(.scale.combined(with: .opacity))
                         } else if isStepComplete(item.step) {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundStyle(.accent)
+                                .transition(.scale(scale: 0.3).combined(with: .opacity))
                         } else {
                             Image(systemName: "circle")
                                 .foregroundStyle(.quaternary)
