@@ -88,8 +88,9 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath $RUNNER_TEMP/Burrow.xcarchive \
             -skipPackagePluginValidation \
-            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
 
       # ── Sign ─────────────────────────────────────────────────────
 
