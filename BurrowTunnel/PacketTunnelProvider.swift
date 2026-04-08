@@ -266,7 +266,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     /// Build NEPacketTunnelNetworkSettings from the WireGuard tunnel configuration.
-    private func makeNetworkSettings(from config: TunnelConfiguration, mtu: Int? = nil) -> NEPacketTunnelNetworkSettings {
+    private func makeNetworkSettings(
+        from config: TunnelConfiguration, mtu: Int? = nil
+    ) -> NEPacketTunnelNetworkSettings {
         // Use the actual peer endpoint IP as tunnelRemoteAddress so the system
         // knows to route WireGuard's own traffic via the physical interface.
         let serverAddress: String = {

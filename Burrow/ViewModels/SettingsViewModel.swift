@@ -172,4 +172,3 @@ enum WireGuardPort: Int, CaseIterable, Identifiable {
         }
     }
 }
-
