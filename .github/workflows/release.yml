@@ -1,0 +1,188 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-sign-notarize:
+    name: Build, Sign & Notarize
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          cache: false
+
+      - name: Symlink Go to /usr/local/bin
+        run: sudo ln -sf "$(which go)" /usr/local/bin/go
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      # ── Certificate & Profile Setup ──────────────────────────────
+
+      - name: Import signing certificate
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/certificate.p12
+          echo "$CERTIFICATE_BASE64" | base64 --decode > $CERTIFICATE_PATH
+
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          security import $CERTIFICATE_PATH \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 \
+            -k $KEYCHAIN_PATH
+
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          security default-keychain -s $KEYCHAIN_PATH
+
+          rm $CERTIFICATE_PATH
+
+      - name: Install provisioning profiles
+        env:
+          APP_PROFILE_BASE64: ${{ secrets.BURROW_APP_PROFILE_BASE64 }}
+          TUNNEL_PROFILE_BASE64: ${{ secrets.BURROW_TUNNEL_PROFILE_BASE64 }}
+        run: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$APP_PROFILE_BASE64" | base64 --decode > \
+            ~/Library/MobileDevice/Provisioning\ Profiles/Burrow_DeveloperID.provisionprofile
+          echo "$TUNNEL_PROFILE_BASE64" | base64 --decode > \
+            ~/Library/MobileDevice/Provisioning\ Profiles/BurrowTunnel_DeveloperID.provisionprofile
+
+      # ── Build ────────────────────────────────────────────────────
+
+      - name: Resolve packages
+        run: |
+          xcodebuild -project Burrow.xcodeproj \
+            -scheme Burrow \
+            -resolvePackageDependencies
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project Burrow.xcodeproj \
+            -scheme Burrow \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath $RUNNER_TEMP/Burrow.xcarchive \
+            -skipPackagePluginValidation \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            CODE_SIGN_STYLE=Automatic
+
+      # ── Sign ─────────────────────────────────────────────────────
+
+      - name: Export and sign app
+        env:
+          IDENTITY: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          APP_PATH=$RUNNER_TEMP/export/Burrow.app
+          mkdir -p $RUNNER_TEMP/export
+          cp -R "$RUNNER_TEMP/Burrow.xcarchive/Products/Applications/Burrow.app" "$APP_PATH"
+
+          xattr -cr "$APP_PATH"
+
+          # Sign inside-out: Network Extension first
+          codesign --force --options runtime --timestamp \
+            --sign "Developer ID Application" \
+            --entitlements BurrowTunnel/BurrowTunnel.release.entitlements \
+            "$APP_PATH/Contents/PlugIns/BurrowTunnel.appex"
+
+          # Sign any embedded frameworks
+          if [ -d "$APP_PATH/Contents/Frameworks" ]; then
+            find "$APP_PATH/Contents/Frameworks" \
+              \( -name "*.framework" -o -name "*.dylib" \) | while read f; do
+              codesign --force --options runtime --timestamp \
+                --sign "Developer ID Application" "$f"
+            done
+          fi
+
+          # Sign the main app last
+          codesign --force --options runtime --timestamp \
+            --sign "Developer ID Application" \
+            --entitlements Burrow/Burrow.release.entitlements \
+            "$APP_PATH"
+
+          # Verify
+          codesign -vvv --deep --strict "$APP_PATH"
+
+      # ── Package ──────────────────────────────────────────────────
+
+      - name: Create DMG
+        run: |
+          create-dmg \
+            --volname "Burrow" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "Burrow.app" 175 190 \
+            --app-drop-link 425 190 \
+            --no-internet-enable \
+            $RUNNER_TEMP/Burrow.dmg \
+            $RUNNER_TEMP/export/Burrow.app || true
+
+          codesign --force --sign "Developer ID Application" $RUNNER_TEMP/Burrow.dmg
+
+      # ── Notarize ─────────────────────────────────────────────────
+
+      - name: Notarize DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID"
+
+          xcrun notarytool submit $RUNNER_TEMP/Burrow.dmg \
+            --keychain-profile "notarytool-profile" \
+            --wait \
+            --timeout 30m
+
+          xcrun stapler staple $RUNNER_TEMP/Burrow.dmg
+          xcrun stapler validate $RUNNER_TEMP/Burrow.dmg
+
+      # ── Release ──────────────────────────────────────────────────
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ runner.temp }}/Burrow.dmg
+          name: Burrow ${{ steps.version.outputs.version }}
+          draft: true
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Cleanup ──────────────────────────────────────────────────
+
+      - name: Clean up keychain
+        if: always()
+        run: security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
