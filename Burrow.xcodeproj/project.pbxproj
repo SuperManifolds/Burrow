@@ -188,6 +188,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				FA12DF4D2F86762100EC7456 /* PBXTargetDependency */,
 				FA88BD7C2F85800E00690D80 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -258,6 +259,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				FA12DF4F2F86762800EC7456 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FA88BD762F85800E00690D80 /* BurrowTunnel */,
@@ -307,6 +309,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */,
+				FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA1E6B3A2F8572E500F6F863 /* Products */;
@@ -409,6 +412,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		FA12DF4D2F86762100EC7456 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = FA12DF4C2F86762100EC7456 /* SwiftLintBuildToolPlugin */;
+		};
+		FA12DF4F2F86762800EC7456 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = FA12DF4E2F86762800EC7456 /* SwiftLintBuildToolPlugin */;
+		};
 		FA1E6B482F8572E600F6F863 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FA1E6B382F8572E500F6F863 /* Burrow */;
@@ -816,6 +827,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.63.2;
+			};
+		};
 		FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mullvad/wireguard-apple";
@@ -827,6 +846,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		FA12DF4C2F86762100EC7456 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		FA12DF4E2F86762800EC7456 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
 		FA88BD832F85805D00690D80 /* WireGuardKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */;

@@ -48,7 +48,10 @@ struct ConnectionStatusView: View {
                     }
                 }
             } label: {
-                Text(connectionViewModel.status.isActive ? String(localized: "Disconnect") : String(localized: "Connect"))
+                let label = connectionViewModel.status.isActive
+                    ? String(localized: "Disconnect")
+                    : String(localized: "Connect")
+                Text(label)
                     .frame(minWidth: 140)
             }
             .buttonStyle(.borderedProminent)
@@ -92,7 +95,37 @@ struct ConnectionStatusView: View {
 }
 #if DEBUG
 #Preview("Disconnected") {
-    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: AccountViewModel())
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(),
+        accountViewModel: AccountViewModel()
+    )
+
+    ConnectionStatusView(
+        connectionViewModel: connectionVM,
+        serverListViewModel: ServerListViewModel()
+    )
+    .frame(width: 400, height: 400)
+}
+
+#Preview("Connected") {
+    let relay = Relay(
+        hostname: "se-got-wg-001",
+        location: "se-got",
+        active: true,
+        owned: true,
+        provider: "31173",
+        ipv4AddrIn: "185.213.154.68",
+        ipv6AddrIn: "2a03:1b20:5:f011::a01f",
+        publicKey: "bGVhc2VzYXRpc2ZpZWQ=",
+        weight: 100
+    )
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(
+            status: .connected(since: Date().addingTimeInterval(-3600)),
+            connectedRelay: relay
+        ),
+        accountViewModel: AccountViewModel()
+    )
 
     ConnectionStatusView(
         connectionViewModel: connectionVM,
@@ -101,4 +134,3 @@ struct ConnectionStatusView: View {
     .frame(width: 400, height: 400)
 }
 #endif
-

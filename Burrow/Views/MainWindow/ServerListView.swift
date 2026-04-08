@@ -6,7 +6,17 @@ struct ServerListView: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @EnvironmentObject var accountViewModel: AccountViewModel
 
-    @State private var expandedCountries: Set<String> = []
+    @State private var expandedCountries: Set<String>
+
+    init(
+        serverListViewModel: ServerListViewModel,
+        connectionViewModel: ConnectionViewModel,
+        expandedCountries: Set<String> = []
+    ) {
+        self.serverListViewModel = serverListViewModel
+        self.connectionViewModel = connectionViewModel
+        _expandedCountries = State(initialValue: expandedCountries)
+    }
 
     var body: some View {
         Group {
@@ -32,11 +42,32 @@ struct ServerListView: View {
             } else {
                 List {
                     ForEach(serverListViewModel.filteredCountries) { country in
-                        countryRow(country)
+                        CountryRowView(
+                            country: country,
+                            isExpanded: isExpanded(country)
+                        ) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                if expandedCountries.contains(country.id) {
+                                    expandedCountries.remove(country.id)
+                                } else {
+                                    expandedCountries.insert(country.id)
+                                }
+                            }
+                        }
 
                         if isExpanded(country) {
                             ForEach(country.cities) { city in
-                                cityRow(country: country, city: city)
+                                CityRowView(
+                                    city: city,
+                                    ping: serverListViewModel.pings[city.id]
+                                ) {
+                                    if let relay = serverListViewModel.selectRelay(in: city) {
+                                        serverListViewModel.selectedRelay = relay
+                                        Task {
+                                            await connectionViewModel.connect(to: relay)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -94,92 +125,21 @@ struct ServerListView: View {
         expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty
     }
 
-    private func pingColor(_ ms: Int) -> Color {
-        switch ms {
-            case ..<25:     Color(.systemGreen)
-            case ..<50:     Color(.systemMint)
-            case ..<80:     Color(.systemTeal)
-            case ..<120:    Color(.systemYellow)
-            case ..<180:    Color(.systemOrange)
-            case ..<250:    Color(.systemPink)
-            default:        Color(.systemRed)
-        }
-    }
-
-    // MARK: - Rows
-
-    private func countryRow(_ country: RelayCountryGroup) -> some View {
-        Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                if expandedCountries.contains(country.id) {
-                    expandedCountries.remove(country.id)
-                } else {
-                    expandedCountries.insert(country.id)
-                }
-            }
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: isExpanded(country) ? "chevron.down" : "chevron.right")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 10)
-
-                Text(country.countryCode.countryFlag)
-
-                Text(country.countryName)
-                    .fontWeight(.medium)
-
-                Spacer()
-
-                Text("\(country.cities.count)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func cityRow(country: RelayCountryGroup, city: RelayCityGroup) -> some View {
-        Button {
-            if let relay = serverListViewModel.selectRelay(in: city) {
-                serverListViewModel.selectedRelay = relay
-                Task {
-                    await connectionViewModel.connect(to: relay)
-                }
-            }
-        } label: {
-            HStack {
-                Text(city.cityName)
-                    .foregroundStyle(.primary)
-
-                Spacer()
-
-                if let ping = serverListViewModel.pings[city.id] {
-                    Text("\(ping) ms")
-                        .font(.caption)
-                        .foregroundStyle(pingColor(ping))
-                        .monospacedDigit()
-                } else {
-                    ProgressView()
-                        .controlSize(.small)
-                }
-            }
-            .padding(.leading, 26)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(city.cityName)")
-    }
 }
 
 #if DEBUG
 #Preview {
+    let serverListVM = ServerListViewModel.preview()
     let accountVM = AccountViewModel()
-    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: accountVM)
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(),
+        accountViewModel: accountVM
+    )
 
     ServerListView(
-        serverListViewModel: ServerListViewModel(),
-        connectionViewModel: connectionVM
+        serverListViewModel: serverListVM,
+        connectionViewModel: connectionVM,
+        expandedCountries: ["se"]
     )
     .environmentObject(accountVM)
     .frame(width: 260, height: 500)

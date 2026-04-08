@@ -73,6 +73,30 @@ final class ServerListViewModel: ObservableObject {
         return selector.selectRelay(from: city.relays, in: nil)
     }
 
+    #if DEBUG
+    /// Create a view model pre-populated with relay data from the bundled JSON.
+    static func preview() -> ServerListViewModel {
+        let vm = ServerListViewModel()
+        guard let url = Bundle.main.url(forResource: "preview_relays", withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
+            return vm
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        guard let relayList = try? decoder.decode(RelayList.self, from: data) else {
+            return vm
+        }
+        let service = RelayListService(apiClient: MullvadAPIClient())
+        vm.countries = service.groupedRelays(from: relayList)
+        for country in vm.countries {
+            for city in country.cities {
+                vm.pings[city.id] = Int.random(in: 10...200)
+            }
+        }
+        return vm
+    }
+    #endif
+
     /// Measure ping to one relay per city.
     private func measurePings() {
         let targets: [(String, String)] = countries.flatMap { $0.cities }.compactMap { city in
