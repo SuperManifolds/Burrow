@@ -26,6 +26,10 @@ jobs:
       - name: Resolve packages
         run: xcodebuild -project Burrow.xcodeproj -scheme Burrow -resolvePackageDependencies
 
+      - name: Symlink Go to /usr/local/bin
+        run: |
+          sudo ln -sf "$(which go)" /usr/local/bin/go
+
       - name: Build
         run: |
           xcodebuild -project Burrow.xcodeproj \
