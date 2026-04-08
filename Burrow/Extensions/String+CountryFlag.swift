@@ -14,7 +14,7 @@ extension String {
         }
 
         let base: UInt32 = 0x1F1E6 - 0x41 // Regional Indicator 'A' minus ASCII 'A'
-        let flags = uppercased.unicodeScalars.map { Unicode.Scalar(base + $0.value)! }
+        let flags = uppercased.unicodeScalars.compactMap { Unicode.Scalar(base + $0.value) }
         return String(flags.map { Character($0) })
     }
 }

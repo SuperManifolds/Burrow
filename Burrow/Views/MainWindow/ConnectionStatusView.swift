@@ -81,12 +81,12 @@ struct ConnectionStatusView: View {
 
     private var statusIcon: String {
         switch connectionViewModel.status {
-        case .connected:
-            return "checkmark.shield.fill"
-        case .connecting, .disconnecting:
-            return "antenna.radiowaves.left.and.right"
-        case .disconnected:
-            return "shield.slash"
+            case .connected:
+                return "checkmark.shield.fill"
+            case .connecting, .disconnecting:
+                return "antenna.radiowaves.left.and.right"
+            case .disconnected:
+                return "shield.slash"
         }
     }
 }

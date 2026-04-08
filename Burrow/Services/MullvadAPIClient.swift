@@ -5,6 +5,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
 
     // MARK: - Properties
 
+    // swiftlint:disable:next force_unwrapping
     private let baseURL = URL(string: "https://api.mullvad.net")!
     private let session: URLSession
     private let decoder: JSONDecoder
@@ -39,37 +40,37 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         }
 
         switch httpResponse.statusCode {
-        case 200:
-            let tokenResponse = try decodeResponse(AuthTokenResponse.self, from: data)
+            case 200:
+                let tokenResponse = try decodeResponse(AuthTokenResponse.self, from: data)
 
-            let isoFormatter = ISO8601DateFormatter()
-            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            // Try with fractional seconds first, then without
-            let expiry = isoFormatter.date(from: tokenResponse.expiry) ?? {
-                let fallback = ISO8601DateFormatter()
-                fallback.formatOptions = [.withInternetDateTime]
-                return fallback.date(from: tokenResponse.expiry)
-            }()
-            guard let expiry else {
-                throw MullvadAPIError.decodingError(
-                    underlying: DecodingError.dataCorrupted(
-                        .init(codingPath: [], debugDescription: "Invalid expiry date format")
+                let isoFormatter = ISO8601DateFormatter()
+                isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                // Try with fractional seconds first, then without
+                let expiry = isoFormatter.date(from: tokenResponse.expiry) ?? {
+                    let fallback = ISO8601DateFormatter()
+                    fallback.formatOptions = [.withInternetDateTime]
+                    return fallback.date(from: tokenResponse.expiry)
+                }()
+                guard let expiry else {
+                    throw MullvadAPIError.decodingError(
+                        underlying: DecodingError.dataCorrupted(
+                            .init(codingPath: [], debugDescription: "Invalid expiry date format")
+                        )
                     )
-                )
-            }
+                }
 
-            return AccountCredential(
-                accountNumber: accountNumber,
-                accessToken: tokenResponse.accessToken,
-                expiry: expiry
-            )
-        case 400, 401:
-            throw MullvadAPIError.invalidAccount
-        default:
-            throw MullvadAPIError.unexpectedStatus(
-                code: httpResponse.statusCode,
-                body: String(data: data, encoding: .utf8)
-            )
+                return AccountCredential(
+                    accountNumber: accountNumber,
+                    accessToken: tokenResponse.accessToken,
+                    expiry: expiry
+                )
+            case 400, 401:
+                throw MullvadAPIError.invalidAccount
+            default:
+                throw MullvadAPIError.unexpectedStatus(
+                    code: httpResponse.statusCode,
+                    body: String(data: data, encoding: .utf8)
+                )
         }
     }
 
@@ -95,17 +96,17 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         }
 
         switch httpResponse.statusCode {
-        case 200, 201:
-            return try decodeResponse(Device.self, from: data)
-        case 401:
-            throw MullvadAPIError.unauthorized
-        case 409:
-            throw MullvadAPIError.deviceLimitReached
-        default:
-            throw MullvadAPIError.unexpectedStatus(
-                code: httpResponse.statusCode,
-                body: String(data: data, encoding: .utf8)
-            )
+            case 200, 201:
+                return try decodeResponse(Device.self, from: data)
+            case 401:
+                throw MullvadAPIError.unauthorized
+            case 409:
+                throw MullvadAPIError.deviceLimitReached
+            default:
+                throw MullvadAPIError.unexpectedStatus(
+                    code: httpResponse.statusCode,
+                    body: String(data: data, encoding: .utf8)
+                )
         }
     }
 
@@ -143,15 +144,15 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         }
 
         switch httpResponse.statusCode {
-        case 200:
-            return try decodeResponse([Device].self, from: data)
-        case 401:
-            throw MullvadAPIError.unauthorized
-        default:
-            throw MullvadAPIError.unexpectedStatus(
-                code: httpResponse.statusCode,
-                body: String(data: data, encoding: .utf8)
-            )
+            case 200:
+                return try decodeResponse([Device].self, from: data)
+            case 401:
+                throw MullvadAPIError.unauthorized
+            default:
+                throw MullvadAPIError.unexpectedStatus(
+                    code: httpResponse.statusCode,
+                    body: String(data: data, encoding: .utf8)
+                )
         }
     }
 
@@ -168,15 +169,15 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         }
 
         switch httpResponse.statusCode {
-        case 200, 204:
-            return
-        case 401:
-            throw MullvadAPIError.unauthorized
-        default:
-            throw MullvadAPIError.unexpectedStatus(
-                code: httpResponse.statusCode,
-                body: String(data: data, encoding: .utf8)
-            )
+            case 200, 204:
+                return
+            case 401:
+                throw MullvadAPIError.unauthorized
+            default:
+                throw MullvadAPIError.unexpectedStatus(
+                    code: httpResponse.statusCode,
+                    body: String(data: data, encoding: .utf8)
+                )
         }
     }
 

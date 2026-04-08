@@ -47,12 +47,12 @@ final class KeychainService: KeychainStoring, Sendable {
         let status = SecItemCopyMatching(query as CFDictionary, &result)
 
         switch status {
-        case errSecSuccess:
-            return result as? Data
-        case errSecItemNotFound:
-            return nil
-        default:
-            throw KeychainError.loadFailed(status: status)
+            case errSecSuccess:
+                return result as? Data
+            case errSecItemNotFound:
+                return nil
+            default:
+                throw KeychainError.loadFailed(status: status)
         }
     }
 
@@ -80,12 +80,12 @@ enum KeychainError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .saveFailed(let status):
-            return "Failed to save to Keychain (status: \(status))."
-        case .loadFailed(let status):
-            return "Failed to load from Keychain (status: \(status))."
-        case .deleteFailed(let status):
-            return "Failed to delete from Keychain (status: \(status))."
+            case .saveFailed(let status):
+                return "Failed to save to Keychain (status: \(status))."
+            case .loadFailed(let status):
+                return "Failed to load from Keychain (status: \(status))."
+            case .deleteFailed(let status):
+                return "Failed to delete from Keychain (status: \(status))."
         }
     }
 }

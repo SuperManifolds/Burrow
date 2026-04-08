@@ -142,7 +142,9 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             let lines = config.components(separatedBy: "\n")
                             let tx = lines.first(where: { $0.hasPrefix("tx_bytes=") }) ?? "tx_bytes=?"
                             let rx = lines.first(where: { $0.hasPrefix("rx_bytes=") }) ?? "rx_bytes=?"
-                            let hs = lines.first(where: { $0.hasPrefix("last_handshake_time_sec=") }) ?? "last_handshake=?"
+                            let hs = lines.first(where: {
+                                $0.hasPrefix("last_handshake_time_sec=")
+                            }) ?? "last_handshake=?"
                             let ep = lines.first(where: { $0.hasPrefix("endpoint=") }) ?? "endpoint=?"
                             TunnelLog.write("Status at \(delay)s: \(tx) \(rx) \(hs) \(ep)")
                         }
@@ -165,7 +167,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)?) {
-        completionHandler?("ok".data(using: .utf8))
+        completionHandler?(Data("ok".utf8))
     }
 
     override func sleep(completionHandler: @escaping () -> Void) {
@@ -230,10 +232,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let serverAddress: String = {
             guard let endpoint = config.peers.first?.endpoint else { return "127.0.0.1" }
             switch endpoint.host {
-            case .ipv4(let address): return "\(address)"
-            case .ipv6(let address): return "\(address)"
-            case .name(let hostname, _): return hostname
-            @unknown default: return "127.0.0.1"
+                case .ipv4(let address): return "\(address)"
+                case .ipv6(let address): return "\(address)"
+                case .name(let hostname, _): return hostname
+                @unknown default: return "127.0.0.1"
             }
         }()
         let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: serverAddress)
@@ -344,10 +346,10 @@ enum PacketTunnelError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingConfiguration:
-            return "No WireGuard configuration found in tunnel provider settings."
-        case .invalidConfiguration:
-            return "The WireGuard configuration could not be parsed."
+            case .missingConfiguration:
+                return "No WireGuard configuration found in tunnel provider settings."
+            case .invalidConfiguration:
+                return "The WireGuard configuration could not be parsed."
         }
     }
 }
@@ -361,10 +363,10 @@ private func wg_log(_ level: OSLogType, message: String) {
 extension WireGuardLogLevel {
     var osLogLevel: OSLogType {
         switch self {
-        case .verbose:
-            return .debug
-        case .error:
-            return .error
+            case .verbose:
+                return .debug
+            case .error:
+                return .error
         }
     }
 }

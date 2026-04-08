@@ -60,10 +60,10 @@ final class SettingsViewModel: ObservableObject {
     /// The DNS server address to use for tunnel connections.
     var effectiveDNS: String {
         switch dnsOption {
-        case .mullvad:
-            return "10.64.0.1"
-        case .custom:
-            return customDNS.isEmpty ? "10.64.0.1" : customDNS
+            case .mullvad:
+                return "10.64.0.1"
+            case .custom:
+                return customDNS.isEmpty ? "10.64.0.1" : customDNS
         }
     }
 
@@ -117,15 +117,15 @@ final class SettingsViewModel: ObservableObject {
 // MARK: - Settings Types
 
 enum DNSOption: String, CaseIterable, Identifiable {
-    case mullvad = "mullvad"
-    case custom = "custom"
+    case mullvad
+    case custom
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
-        case .mullvad: return "Mullvad DNS (10.64.0.1)"
-        case .custom: return "Custom"
+            case .mullvad: return "Mullvad DNS (10.64.0.1)"
+            case .custom: return "Custom"
         }
     }
 }
@@ -139,17 +139,17 @@ enum WireGuardPort: Int, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .automatic: return "Automatic"
-        case .port51820: return "51820"
-        case .port53: return "53"
+            case .automatic: return "Automatic"
+            case .port51820: return "51820"
+            case .port53: return "53"
         }
     }
 
     var portNumber: Int {
         switch self {
-        case .automatic: return 51820
-        case .port51820: return 51820
-        case .port53: return 53
+            case .automatic: return 51820
+            case .port51820: return 51820
+            case .port53: return 53
         }
     }
 }

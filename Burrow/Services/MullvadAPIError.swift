@@ -22,18 +22,18 @@ enum MullvadAPIError: LocalizedError, Sendable {
 
     var errorDescription: String? {
         switch self {
-        case .invalidAccount:
-            return "Invalid account number. Please check and try again."
-        case .unauthorized:
-            return "Session expired. Please log in again."
-        case .deviceLimitReached:
-            return "Device limit reached (maximum 5). Remove an existing device to continue."
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
-        case .decodingError:
-            return "Unexpected response from server."
-        case .unexpectedStatus(let code, _):
-            return "Server returned an unexpected response (HTTP \(code))."
+            case .invalidAccount:
+                return "Invalid account number. Please check and try again."
+            case .unauthorized:
+                return "Session expired. Please log in again."
+            case .deviceLimitReached:
+                return "Device limit reached (maximum 5). Remove an existing device to continue."
+            case .networkError(let error):
+                return "Network error: \(error.localizedDescription)"
+            case .decodingError:
+                return "Unexpected response from server."
+            case .unexpectedStatus(let code, _):
+                return "Server returned an unexpected response (HTTP \(code))."
         }
     }
 }

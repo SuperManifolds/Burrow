@@ -35,14 +35,18 @@ struct ServerListView: View {
                     ForEach(serverListViewModel.filteredCountries) { country in
                         countryRow(country)
 
-                        if expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty {
+                        if isExpanded(country) {
                             ForEach(country.cities) { city in
                                 cityRow(country: country, city: city)
                             }
                         }
                     }
                 }
-                .searchable(text: $serverListViewModel.searchText, placement: .sidebar, prompt: "Search countries or cities")
+                .searchable(
+                    text: $serverListViewModel.searchText,
+                    placement: .sidebar,
+                    prompt: "Search countries or cities"
+                )
             }
         }
         .toolbar {
@@ -87,15 +91,19 @@ struct ServerListView: View {
 
     // MARK: - Helpers
 
+    private func isExpanded(_ country: RelayCountryGroup) -> Bool {
+        expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty
+    }
+
     private func pingColor(_ ms: Int) -> Color {
         switch ms {
-        case ..<25:     Color(.systemGreen)
-        case ..<50:     Color(.systemMint)
-        case ..<80:     Color(.systemTeal)
-        case ..<120:    Color(.systemYellow)
-        case ..<180:    Color(.systemOrange)
-        case ..<250:    Color(.systemPink)
-        default:        Color(.systemRed)
+            case ..<25:     Color(.systemGreen)
+            case ..<50:     Color(.systemMint)
+            case ..<80:     Color(.systemTeal)
+            case ..<120:    Color(.systemYellow)
+            case ..<180:    Color(.systemOrange)
+            case ..<250:    Color(.systemPink)
+            default:        Color(.systemRed)
         }
     }
 
@@ -112,7 +120,7 @@ struct ServerListView: View {
             }
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: (expandedCountries.contains(country.id) || !serverListViewModel.searchText.isEmpty) ? "chevron.down" : "chevron.right")
+                Image(systemName: isExpanded(country) ? "chevron.down" : "chevron.right")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .frame(width: 10)

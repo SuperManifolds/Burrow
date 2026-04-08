@@ -152,29 +152,27 @@ final class TunnelManager: ObservableObject {
 
         var errorDescription: String? {
             switch self {
-            case .invalidSession:
-                return "Failed to create tunnel session."
+                case .invalidSession:
+                    return "Failed to create tunnel session."
             }
         }
     }
 
     private func updateStatus(from vpnStatus: NEVPNStatus) {
         switch vpnStatus {
-        case .disconnected, .invalid:
-            status = .disconnected
-            connectedDate = nil
-            connectedRelay = nil
-        case .connecting, .reasserting:
-            status = .connecting
-        case .connected:
-            connectedDate = Date()
-            status = .connected(since: connectedDate ?? Date())
-        case .disconnecting:
-            status = .disconnecting
-        @unknown default:
-            status = .disconnected
+            case .disconnected, .invalid:
+                status = .disconnected
+                connectedDate = nil
+                connectedRelay = nil
+            case .connecting, .reasserting:
+                status = .connecting
+            case .connected:
+                connectedDate = Date()
+                status = .connected(since: connectedDate ?? Date())
+            case .disconnecting:
+                status = .disconnecting
+            @unknown default:
+                status = .disconnected
         }
     }
 }
-
-

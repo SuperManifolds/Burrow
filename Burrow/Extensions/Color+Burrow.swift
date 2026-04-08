@@ -21,12 +21,12 @@ extension ShapeStyle where Self == Color {
     /// Color reflecting the current connection status.
     static func connectionStatus(_ status: ConnectionStatus) -> Color {
         switch status {
-        case .connected:
-            return .burrowConnected
-        case .connecting, .disconnecting:
-            return .burrowWarning
-        case .disconnected:
-            return .burrowDisconnected
+            case .connected:
+                return .burrowConnected
+            case .connecting, .disconnecting:
+                return .burrowWarning
+            case .disconnected:
+                return .burrowDisconnected
         }
     }
 }

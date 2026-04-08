@@ -10,24 +10,24 @@ enum ConnectionStatus: Sendable, Equatable {
     /// Whether the tunnel is currently active (connecting or connected).
     var isActive: Bool {
         switch self {
-        case .connecting, .connected:
-            return true
-        case .disconnected, .disconnecting:
-            return false
+            case .connecting, .connected:
+                return true
+            case .disconnected, .disconnecting:
+                return false
         }
     }
 
     /// Human-readable description of the current status.
     var displayText: String {
         switch self {
-        case .disconnected:
-            return "Disconnected"
-        case .connecting:
-            return "Connecting..."
-        case .connected:
-            return "Connected"
-        case .disconnecting:
-            return "Disconnecting..."
+            case .disconnected:
+                return "Disconnected"
+            case .connecting:
+                return "Connecting..."
+            case .connected:
+                return "Connected"
+            case .disconnecting:
+                return "Disconnecting..."
         }
     }
 }

@@ -78,7 +78,9 @@ struct LoginView: View {
             HStack(spacing: 4) {
                 Text("Don't have an account?")
                     .foregroundStyle(.tertiary)
-                Link("Sign up", destination: URL(string: "https://mullvad.net/en/account/create")!)
+                if let signupURL = URL(string: "https://mullvad.net/en/account/create") {
+                    Link("Sign up", destination: signupURL)
+                }
             }
             .font(.caption2)
             .padding(.bottom, 16)

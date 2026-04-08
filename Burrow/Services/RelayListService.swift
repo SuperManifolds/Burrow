@@ -22,9 +22,17 @@ actor RelayListService {
         self.apiClient = apiClient
         self.cacheMaxAge = cacheMaxAge
 
-        let directory = cacheDirectory ?? FileManager.default.urls(
+        let directory: URL
+        if let cacheDirectory {
+            directory = cacheDirectory
+        } else if let caches = FileManager.default.urls(
             for: .cachesDirectory, in: .userDomainMask
-        ).first!.appendingPathComponent("com.burrow.vpn", isDirectory: true)
+        ).first {
+            directory = caches.appendingPathComponent("com.burrow.vpn", isDirectory: true)
+        } else {
+            directory = FileManager.default.temporaryDirectory
+                .appendingPathComponent("com.burrow.vpn", isDirectory: true)
+        }
 
         self.cacheURL = directory.appendingPathComponent("relays.json")
     }

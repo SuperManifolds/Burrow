@@ -96,32 +96,33 @@ final class ServerListViewModel: ObservableObject {
 
     /// Measure TCP connection establishment time to estimate latency.
     private static func measureTCPLatency(to host: String, port: UInt16) async -> Int? {
+        guard let nwPort = NWEndpoint.Port(rawValue: port) else { return nil }
         let connection = NWConnection(
             host: NWEndpoint.Host(host),
-            port: NWEndpoint.Port(rawValue: port)!,
+            port: nwPort,
             using: .tcp
         )
 
-        return await withCheckedContinuation { continuation in
+        return await withCheckedContinuation { (continuation: CheckedContinuation<Int?, Never>) in
             let start = DispatchTime.now()
             var resumed = false
 
             connection.stateUpdateHandler = { state in
                 guard !resumed else { return }
                 switch state {
-                case .ready, .failed, .waiting:
-                    resumed = true
-                    let elapsed = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds
-                    let ms = Int(elapsed / 1_000_000)
-                    connection.cancel()
-                    continuation.resume(returning: ms)
-                case .cancelled:
-                    if !resumed {
+                    case .ready, .failed, .waiting:
                         resumed = true
-                        continuation.resume(returning: nil)
-                    }
-                default:
-                    break
+                        let elapsed = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds
+                        let ms = Int(elapsed / 1_000_000)
+                        connection.cancel()
+                        continuation.resume(returning: ms)
+                    case .cancelled:
+                        if !resumed {
+                            resumed = true
+                            continuation.resume(returning: nil)
+                        }
+                    default:
+                        break
                 }
             }
 
