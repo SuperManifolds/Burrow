@@ -38,6 +38,17 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         return try? String(contentsOf: url, encoding: .utf8)
     }
 
+    /// Read transfer statistics from the shared container.
+    func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
+        guard let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
+            .appendingPathComponent("tunnel.stats"),
+              let data = try? Data(contentsOf: url),
+              let stats = try? JSONDecoder().decode(TransferStats.self, from: data)
+        else { return nil }
+        return (tx: stats.tx, rx: stats.rx)
+    }
+
     // MARK: - Initialization
 
     init() {
@@ -178,4 +189,10 @@ final class TunnelManager: ObservableObject, TunnelManaging {
                 status = .disconnected
         }
     }
+}
+
+/// JSON structure for transfer stats shared between app and tunnel extension.
+struct TransferStats: Codable {
+    let tx: UInt64
+    let rx: UInt64
 }

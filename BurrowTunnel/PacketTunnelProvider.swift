@@ -42,6 +42,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Properties
 
+    private var statsTimer: DispatchSourceTimer?
+
     private lazy var adapter: WireGuardAdapter = {
         WireGuardAdapter(with: self, shouldHandleReasserting: false) { logLevel, message in
             TunnelLog.write("[WireGuard \(logLevel)] \(message)")
@@ -129,6 +131,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 TunnelLog.write("WireGuard adapter started successfully")
                 TunnelLog.write("  interfaceName: \(self?.adapter.interfaceName ?? "nil")")
                 completionHandler(nil)
+                self?.startStatsTimer()
 
                 // Log runtime config at intervals to check handshake progress
                 for delay in [2, 5, 10] {
@@ -158,6 +161,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         with reason: NEProviderStopReason,
         completionHandler: @escaping () -> Void
     ) {
+        stopStatsTimer()
         adapter.stop { error in
             if let error {
                 wg_log(.error, message: "Failed to stop WireGuard adapter: \(error)")
@@ -176,6 +180,41 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func wake() {
         // No-op: WireGuardKit handles reconnection on wake
+    }
+
+    // MARK: - Transfer Stats
+
+    private func startStatsTimer() {
+        let timer = DispatchSource.makeTimerSource(queue: .global(qos: .utility))
+        timer.schedule(deadline: .now() + 2, repeating: 2)
+        timer.setEventHandler { [weak self] in
+            self?.writeTransferStats()
+        }
+        timer.resume()
+        statsTimer = timer
+    }
+
+    private func stopStatsTimer() {
+        statsTimer?.cancel()
+        statsTimer = nil
+    }
+
+    private func writeTransferStats() {
+        adapter.getRuntimeConfiguration { config in
+            guard let config else { return }
+            let lines = config.components(separatedBy: "\n")
+            let tx = lines.first(where: { $0.hasPrefix("tx_bytes=") })
+                .flatMap { UInt64($0.dropFirst("tx_bytes=".count)) } ?? 0
+            let rx = lines.first(where: { $0.hasPrefix("rx_bytes=") })
+                .flatMap { UInt64($0.dropFirst("rx_bytes=".count)) } ?? 0
+
+            guard let url = FileManager.default
+                .containerURL(forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup)?
+                .appendingPathComponent("tunnel.stats") else { return }
+
+            let json = "{\"tx\":\(tx),\"rx\":\(rx)}"
+            try? json.write(to: url, atomically: true, encoding: .utf8)
+        }
     }
 
     // MARK: - Configuration Builder

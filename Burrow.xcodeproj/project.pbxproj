@@ -11,6 +11,7 @@
 		FA143D942F86542000E2E7E0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5CF2AC05C44C7B8262BA3D /* Constants.swift */; };
 		FA143D952F86542000E2E7E0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5CF2AC05C44C7B8262BA3D /* Constants.swift */; };
 		FA143D962F86542000E2E7E0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5CF2AC05C44C7B8262BA3D /* Constants.swift */; };
+		FA66DAB22F868563002127EF /* AGENTS.md in Resources */ = {isa = PBXBuildFile; fileRef = FA66DAB12F868563002127EF /* AGENTS.md */; };
 		FA88BD752F85800E00690D80 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA88BD742F85800E00690D80 /* NetworkExtension.framework */; };
 		FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA88BD832F85805D00690D80 /* WireGuardKit */; };
@@ -59,6 +60,9 @@
 		FA1E6B392F8572E500F6F863 /* Burrow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Burrow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1E6B462F8572E600F6F863 /* BurrowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BurrowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1E6B502F8572E600F6F863 /* BurrowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BurrowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA66DAB12F868563002127EF /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
+		FA66DAB32F868648002127EF /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
+		FA66DAB42F868759002127EF /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		FA88BD722F85800E00690D80 /* BurrowTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BurrowTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA88BD742F85800E00690D80 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -151,6 +155,9 @@
 				FA88BD732F85800E00690D80 /* Frameworks */,
 				FA1E6B3A2F8572E500F6F863 /* Products */,
 				2A8A3CB0DBF540D78BDEF570 /* Shared */,
+				FA66DAB12F868563002127EF /* AGENTS.md */,
+				FA66DAB32F868648002127EF /* CONTRIBUTING.md */,
+				FA66DAB42F868759002127EF /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
@@ -329,6 +336,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA66DAB22F868563002127EF /* AGENTS.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

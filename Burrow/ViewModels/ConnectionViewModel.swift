@@ -11,6 +11,8 @@ final class ConnectionViewModel: ObservableObject {
     @Published private(set) var connectedRelay: Relay?
     @Published private(set) var connectionDuration: TimeInterval = 0
     @Published private(set) var error: String?
+    @Published private(set) var transferTx: UInt64 = 0
+    @Published private(set) var transferRx: UInt64 = 0
 
     // MARK: - Dependencies
 
@@ -70,6 +72,8 @@ final class ConnectionViewModel: ObservableObject {
         await tunnelManager.disconnect()
         stopDurationTimer()
         connectionDuration = 0
+        transferTx = 0
+        transferRx = 0
     }
 
     /// Read the diagnostic log from the tunnel extension.
@@ -97,7 +101,12 @@ final class ConnectionViewModel: ObservableObject {
                 return
             }
             Task { @MainActor [weak self] in
-                self?.connectionDuration = Date().timeIntervalSince(startDate)
+                guard let self else { return }
+                self.connectionDuration = Date().timeIntervalSince(startDate)
+                if let stats = self.tunnelManager.readTransferStats() {
+                    self.transferTx = stats.tx
+                    self.transferRx = stats.rx
+                }
             }
         }
     }
@@ -118,4 +127,20 @@ extension ConnectionViewModel {
         let seconds = Int(connectionDuration) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
+
+    /// Format bytes to human-readable string (e.g. "1.12 GB", "340 MB").
+    static func formattedBytes(_ bytes: UInt64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .binary
+        formatter.allowedUnits = [.useBytes, .useKB, .useMB, .useGB, .useTB]
+        return formatter.string(fromByteCount: Int64(bytes))
+    }
+
+    #if DEBUG
+    /// Seed transfer stats for SwiftUI previews.
+    func setPreviewTransferStats(tx: UInt64, rx: UInt64) {
+        transferTx = tx
+        transferRx = rx
+    }
+    #endif
 }
