@@ -31,6 +31,7 @@ struct BurrowApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 800, height: 600)
+        .defaultLaunchBehavior(accountViewModel.isLoggedIn ? .suppressed : .presented)
 
         Settings {
             SettingsView(
