@@ -100,7 +100,22 @@ struct ServerListView: View {
                         }
                     }
                 }
-                .contextMenu(forSelectionType: String.self) { _ in
+                .contextMenu(forSelectionType: String.self) { hostnames in
+                    if let city = resolveCity(from: hostnames) {
+                        Button("Connect") {
+                            selectAndConnect(city)
+                        }
+                        Divider()
+                        if serverListViewModel.isFavourite(city) {
+                            Button("Remove from Favourites") {
+                                serverListViewModel.toggleFavourite(city)
+                            }
+                        } else {
+                            Button("Add to Favourites") {
+                                serverListViewModel.toggleFavourite(city)
+                            }
+                        }
+                    }
                 } primaryAction: { hostnames in
                     guard let hostname = hostnames.first else { return }
                     for country in serverListViewModel.countries {
@@ -191,6 +206,17 @@ struct ServerListView: View {
     }
 
     // MARK: - Helpers
+
+    private func resolveCity(from hostnames: Set<String>) -> RelayCityGroup? {
+        guard let tag = hostnames.first else { return nil }
+        let hostname = tag.hasPrefix("fav-") ? String(tag.dropFirst(4)) : tag
+        for country in serverListViewModel.countries {
+            for city in country.cities where city.relays.contains(where: { $0.hostname == hostname }) {
+                return city
+            }
+        }
+        return nil
+    }
 
     private func selectAndConnect(_ city: RelayCityGroup) {
         if let relay = serverListViewModel.selectRelay(in: city) {
