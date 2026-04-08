@@ -7,6 +7,7 @@ struct ServerListView: View {
     @EnvironmentObject var accountViewModel: AccountViewModel
 
     @State private var expandedCountries: Set<String>
+    @State private var selectedTag: String?
 
     init(
         serverListViewModel: ServerListViewModel,
@@ -40,7 +41,7 @@ struct ServerListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List {
+                List(selection: selectedHostnameBinding) {
                     if !serverListViewModel.favouriteCities.isEmpty
                         && serverListViewModel.searchText.isEmpty {
                         Section {
@@ -54,11 +55,9 @@ struct ServerListView: View {
                                     ping: serverListViewModel.pings[entry.city.id],
                                     onUnfavourite: {
                                         serverListViewModel.toggleFavourite(entry.city)
-                                    },
-                                    onSelect: {
-                                        connectToCity(entry.city)
                                     }
                                 )
+                                .tag("fav-\(entry.city.relays.first(where: \.active)?.hostname ?? entry.city.id)")
                             }
                         } header: {
                             Text("Favourites")
@@ -88,11 +87,9 @@ struct ServerListView: View {
                                         isFavourite: serverListViewModel.isFavourite(city),
                                         onToggleFavourite: {
                                             serverListViewModel.toggleFavourite(city)
-                                        },
-                                        onSelect: {
-                                            connectToCity(city)
                                         }
                                     )
+                                    .tag(city.relays.first(where: \.active)?.hostname ?? city.id)
                                 }
                             }
                         }
@@ -100,6 +97,16 @@ struct ServerListView: View {
                         if !serverListViewModel.favouriteCities.isEmpty
                             && serverListViewModel.searchText.isEmpty {
                             Text("All Servers")
+                        }
+                    }
+                }
+                .contextMenu(forSelectionType: String.self) { _ in
+                } primaryAction: { hostnames in
+                    guard let hostname = hostnames.first else { return }
+                    for country in serverListViewModel.countries {
+                        for city in country.cities where city.relays.contains(where: { $0.hostname == hostname }) {
+                            selectAndConnect(city)
+                            return
                         }
                     }
                 }
@@ -150,11 +157,41 @@ struct ServerListView: View {
         .accessibilityLabel(String(localized: "Account menu"))
     }
 
+    // MARK: - Selection Binding
+
+    private var selectedHostnameBinding: Binding<String?> {
+        Binding(
+            get: { selectedTag },
+            set: { tag in
+                selectedTag = tag
+                DispatchQueue.main.async {
+                    guard let tag else {
+                        serverListViewModel.selectedRelay = nil
+                        return
+                    }
+                    let hostname = tag.hasPrefix("fav-")
+                        ? String(tag.dropFirst(4))
+                        : tag
+                    for country in serverListViewModel.countries {
+                        for city in country.cities {
+                            if let relay = city.relays.first(where: { $0.hostname == hostname }) {
+                                serverListViewModel.selectedRelay = relay
+                                serverListViewModel.saveSelectedRelay()
+                                return
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+
     // MARK: - Helpers
 
-    private func connectToCity(_ city: RelayCityGroup) {
+    private func selectAndConnect(_ city: RelayCityGroup) {
         if let relay = serverListViewModel.selectRelay(in: city) {
             serverListViewModel.selectedRelay = relay
+            serverListViewModel.saveSelectedRelay()
             Task {
                 await connectionViewModel.connect(to: relay)
             }

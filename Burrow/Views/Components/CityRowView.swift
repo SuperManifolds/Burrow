@@ -6,47 +6,41 @@ struct CityRowView: View {
     let ping: Int?
     var isFavourite: Bool = false
     var onToggleFavourite: (() -> Void)?
-    let onSelect: () -> Void
 
     var body: some View {
-        Button {
-            onSelect()
-        } label: {
-            HStack {
-                if let onToggleFavourite {
-                    Button {
-                        onToggleFavourite()
-                    } label: {
-                        Image(systemName: isFavourite ? "star.fill" : "star")
-                            .font(.caption)
-                            .foregroundStyle(isFavourite ? .accent : .secondary)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(
-                        isFavourite
-                            ? String(localized: "Remove from favourites")
-                            : String(localized: "Add to favourites")
-                    )
-                }
-
-                Text(city.cityName)
-                    .foregroundStyle(.primary)
-
-                Spacer()
-
-                if let ping {
-                    Text("\(ping) ms")
+        HStack {
+            if let onToggleFavourite {
+                Button {
+                    onToggleFavourite()
+                } label: {
+                    Image(systemName: isFavourite ? "star.fill" : "star")
                         .font(.caption)
-                        .foregroundStyle(Color.ping(ping))
-                        .monospacedDigit()
-                } else {
-                    ProgressView()
-                        .controlSize(.small)
+                        .foregroundStyle(isFavourite ? .accent : .secondary)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(
+                    isFavourite
+                        ? String(localized: "Remove from favourites")
+                        : String(localized: "Add to favourites")
+                )
             }
-            .padding(.leading, onToggleFavourite != nil ? 8 : 26)
+
+            Text(city.cityName)
+                .foregroundStyle(.primary)
+
+            Spacer()
+
+            if let ping {
+                Text("\(ping) ms")
+                    .font(.caption)
+                    .foregroundStyle(Color.ping(ping))
+                    .monospacedDigit()
+            } else {
+                ProgressView()
+                    .controlSize(.small)
+            }
         }
-        .buttonStyle(.plain)
+        .padding(.leading, onToggleFavourite != nil ? 8 : 26)
         .accessibilityLabel("\(city.cityName)")
     }
 }
@@ -66,8 +60,7 @@ struct CityRowView: View {
         ),
         ping: 42,
         isFavourite: false,
-        onToggleFavourite: {},
-        onSelect: {}
+        onToggleFavourite: {}
     )
     .padding()
 }
@@ -86,8 +79,7 @@ struct CityRowView: View {
         ),
         ping: 12,
         isFavourite: true,
-        onToggleFavourite: {},
-        onSelect: {}
+        onToggleFavourite: {}
     )
     .padding()
 }

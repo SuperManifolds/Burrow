@@ -6,39 +6,33 @@ struct FavouriteRowView: View {
     let countryCode: String
     let ping: Int?
     let onUnfavourite: () -> Void
-    let onSelect: () -> Void
 
     var body: some View {
-        Button {
-            onSelect()
-        } label: {
-            HStack(spacing: 8) {
-                Button {
-                    onUnfavourite()
-                } label: {
-                    Image(systemName: "star.fill")
-                        .font(.caption)
-                        .foregroundStyle(.accent)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "Remove from favourites"))
+        HStack(spacing: 8) {
+            Button {
+                onUnfavourite()
+            } label: {
+                Image(systemName: "star.fill")
+                    .font(.caption)
+                    .foregroundStyle(.accent)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Remove from favourites"))
 
-                Text(countryCode.countryFlag)
+            Text(countryCode.countryFlag)
 
-                Text(city.cityName)
-                    .foregroundStyle(.primary)
+            Text(city.cityName)
+                .foregroundStyle(.primary)
 
-                Spacer()
+            Spacer()
 
-                if let ping {
-                    Text("\(ping) ms")
-                        .font(.caption)
-                        .foregroundStyle(Color.ping(ping))
-                        .monospacedDigit()
-                }
+            if let ping {
+                Text("\(ping) ms")
+                    .font(.caption)
+                    .foregroundStyle(Color.ping(ping))
+                    .monospacedDigit()
             }
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -58,8 +52,7 @@ struct FavouriteRowView: View {
             ),
             countryCode: "se",
             ping: 12,
-            onUnfavourite: {},
-            onSelect: {}
+            onUnfavourite: {}
         )
         FavouriteRowView(
             city: RelayCityGroup(
@@ -74,8 +67,7 @@ struct FavouriteRowView: View {
             ),
             countryCode: "de",
             ping: 34,
-            onUnfavourite: {},
-            onSelect: {}
+            onUnfavourite: {}
         )
     }
     .frame(width: 260, height: 200)

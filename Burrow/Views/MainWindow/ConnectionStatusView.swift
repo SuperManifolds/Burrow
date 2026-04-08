@@ -61,7 +61,43 @@ struct ConnectionStatusView: View {
                 }
             }
 
-            // Connect / Disconnect button
+            // Switch server info (when connected but a different server is selected)
+            if hasDifferentServerSelected {
+                VStack(spacing: 4) {
+                    Text(String(localized: "Switch to"))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .textCase(.uppercase)
+                    if let locationText = selectedLocationText {
+                        Text(locationText)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                    if let relay = serverListViewModel.selectedRelay {
+                        Text(relay.hostname)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            // Action buttons
+            if hasDifferentServerSelected {
+                Button {
+                    Task {
+                        await connectionViewModel.disconnect()
+                        if let relay = serverListViewModel.selectedRelay {
+                            await connectionViewModel.connect(to: relay)
+                        }
+                    }
+                } label: {
+                    Text(String(localized: "Switch"))
+                        .frame(minWidth: 140)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            }
+
             Button {
                 Task {
                     if connectionViewModel.status.isActive {
@@ -81,7 +117,8 @@ struct ConnectionStatusView: View {
             .tint(connectionViewModel.status.isActive ? .red : .accentColor)
             .controlSize(.large)
             .disabled(
-                !connectionViewModel.status.isActive && serverListViewModel.selectedRelay == nil
+                !connectionViewModel.status.isActive
+                    && serverListViewModel.selectedRelay == nil
             )
 
             if let error = connectionViewModel.error {
@@ -95,6 +132,18 @@ struct ConnectionStatusView: View {
                 Text("Select a server from the sidebar")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
+            } else if !connectionViewModel.status.isActive,
+                      let relay = serverListViewModel.selectedRelay {
+                VStack(spacing: 2) {
+                    if let locationText = selectedLocationText {
+                        Text(locationText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(relay.hostname)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
             }
 
             Spacer()
@@ -181,9 +230,18 @@ struct ConnectionStatusView: View {
         }
     }
 
-    /// Find the country and city for the connected relay.
-    private var connectedCity: (country: RelayCountryGroup, city: RelayCityGroup)? {
-        guard let relay = connectionViewModel.connectedRelay else { return nil }
+    /// Whether a different city is selected than the one currently connected to.
+    private var hasDifferentServerSelected: Bool {
+        guard case .connected = connectionViewModel.status,
+              let connected = connectionViewModel.connectedRelay,
+              let selected = serverListViewModel.selectedRelay else {
+            return false
+        }
+        return connected.location != selected.location
+    }
+
+    /// Find the country and city for a given relay.
+    private func findCity(for relay: Relay) -> (country: RelayCountryGroup, city: RelayCityGroup)? {
         let countryCode = String(relay.location.prefix(2))
         for country in serverListViewModel.countries where country.countryCode == countryCode {
             for city in country.cities where city.relays.contains(where: { $0.hostname == relay.hostname }) {
@@ -193,16 +251,28 @@ struct ConnectionStatusView: View {
         return nil
     }
 
-    /// Resolve connected relay's location to "🇸🇪 Sweden · City".
-    private var connectedLocationText: String? {
-        guard let match = connectedCity else { return nil }
+    private func locationText(for relay: Relay) -> String? {
+        guard let match = findCity(for: relay) else { return nil }
         let flag = match.country.countryCode.countryFlag
         return "\(flag) \(match.country.countryName) · \(match.city.cityName)"
     }
 
+    /// Resolve connected relay's location.
+    private var connectedLocationText: String? {
+        guard let relay = connectionViewModel.connectedRelay else { return nil }
+        return locationText(for: relay)
+    }
+
+    /// Resolve selected relay's location (when disconnected).
+    private var selectedLocationText: String? {
+        guard let relay = serverListViewModel.selectedRelay else { return nil }
+        return locationText(for: relay)
+    }
+
     /// Look up ping for the city containing the connected relay.
     private var connectedPing: Int? {
-        guard let match = connectedCity else { return nil }
+        guard let relay = connectionViewModel.connectedRelay,
+              let match = findCity(for: relay) else { return nil }
         return serverListViewModel.pings[match.city.id]
     }
 
@@ -261,5 +331,47 @@ struct ConnectionStatusView: View {
         serverListViewModel: ServerListViewModel.preview()
     )
     .frame(width: 700, height: 500)
+}
+
+#Preview("Switch Server") {
+    let connectedRelay = Relay(
+        hostname: "se-got-wg-001",
+        location: "se-got",
+        active: true,
+        owned: true,
+        provider: "31173",
+        ipv4AddrIn: "185.213.154.68",
+        ipv6AddrIn: "2a03:1b20:5:f011::a01f",
+        publicKey: "bGVhc2VzYXRpc2ZpZWQ=",
+        weight: 100
+    )
+    let connectionVM: ConnectionViewModel = {
+        let vm = ConnectionViewModel(
+            tunnelManager: MockTunnelManager(
+                status: .connected(since: Date().addingTimeInterval(-3600)),
+                connectedRelay: connectedRelay
+            ),
+            accountViewModel: AccountViewModel()
+        )
+        vm.setPreviewTransferStats(tx: 1_207_959_552, rx: 356_515_840)
+        return vm
+    }()
+    let serverListVM: ServerListViewModel = {
+        let vm = ServerListViewModel.preview()
+        for country in vm.countries where country.countryCode == "de" {
+            if let city = country.cities.first,
+               let relay = city.relays.first {
+                vm.selectedRelay = relay
+                break
+            }
+        }
+        return vm
+    }()
+
+    ConnectionStatusView(
+        connectionViewModel: connectionVM,
+        serverListViewModel: serverListVM
+    )
+    .frame(width: 700, height: 550)
 }
 #endif

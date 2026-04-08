@@ -50,6 +50,7 @@ final class ServerListViewModel: ObservableObject {
     }
 
     private static let favouritesKey = "BurrowFavouriteCityIDs"
+    private static let lastSelectedRelayKey = "BurrowLastSelectedRelay"
 
     private func saveFavourites() {
         UserDefaults.standard.set(
@@ -63,6 +64,27 @@ final class ServerListViewModel: ObservableObject {
             forKey: favouritesKey
         ) ?? []
         return Set(array)
+    }
+
+    func saveSelectedRelay() {
+        UserDefaults.standard.set(
+            selectedRelay?.hostname,
+            forKey: Self.lastSelectedRelayKey
+        )
+    }
+
+    private func restoreLastSelectedRelay() {
+        guard let hostname = UserDefaults.standard.string(
+            forKey: Self.lastSelectedRelayKey
+        ) else { return }
+        for country in countries {
+            for city in country.cities {
+                if let relay = city.relays.first(where: { $0.hostname == hostname }) {
+                    selectedRelay = relay
+                    return
+                }
+            }
+        }
     }
 
     /// Countries filtered by the current search text.
@@ -111,6 +133,7 @@ final class ServerListViewModel: ObservableObject {
         do {
             let relayList = try await relayService.fetchRelayList()
             countries = relayService.groupedRelays(from: relayList)
+            restoreLastSelectedRelay()
             measurePings()
         } catch {
             self.error = error.localizedDescription

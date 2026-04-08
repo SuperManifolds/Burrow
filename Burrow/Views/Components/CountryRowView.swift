@@ -70,7 +70,7 @@ struct CountryRowView: View {
         )
 
         ForEach(cities) { city in
-            CityRowView(city: city, ping: 35, onSelect: {})
+            CityRowView(city: city, ping: 35)
         }
     }
     .frame(width: 260, height: 200)
