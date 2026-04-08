@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          cache: false
+
       - name: Resolve packages
         run: xcodebuild -project Burrow.xcodeproj -scheme Burrow -resolvePackageDependencies
 
