@@ -12,7 +12,7 @@ concurrency:
 jobs:
   build-sign-notarize:
     name: Build, Sign & Notarize
-    runs-on: macos-15
+    runs-on: macos-26
     permissions:
       contents: write
     steps:
