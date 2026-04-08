@@ -8,7 +8,7 @@ import NetworkExtension
 /// tunnel via the Network Extension framework. It communicates with the
 /// `PacketTunnelProvider` running in the BurrowTunnel extension.
 @MainActor
-final class TunnelManager: ObservableObject {
+final class TunnelManager: ObservableObject, TunnelManaging {
 
     // MARK: - Published State
 
