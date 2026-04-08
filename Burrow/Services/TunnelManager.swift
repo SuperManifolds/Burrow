@@ -31,7 +31,7 @@ final class TunnelManager: ObservableObject, TunnelManaging {
     private let appGroupIdentifier = AppIdentifiers.appGroup
 
     /// Read the diagnostic log from the tunnel extension.
-    func readTunnelLog() -> String? {
+    nonisolated func readTunnelLog() -> String? {
         guard let url = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
             .appendingPathComponent("tunnel.log") else { return nil }
@@ -39,7 +39,7 @@ final class TunnelManager: ObservableObject, TunnelManaging {
     }
 
     /// Read transfer statistics from the shared container.
-    func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
+    nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
         guard let url = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
             .appendingPathComponent("tunnel.stats"),
@@ -141,6 +141,9 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         manager.connection.stopVPNTunnel()
         connectedRelay = nil
         status = .disconnecting
+
+        // Reset the manager so the next connect gets a fresh session
+        tunnelManager = nil
     }
 
     // MARK: - Status Observation
@@ -156,6 +159,7 @@ final class TunnelManager: ObservableObject, TunnelManaging {
                 return
             }
             Task { @MainActor in
+                print("[Burrow TunnelManager] NEVPNStatusDidChange: \(connection.status.rawValue) at \(Date())")
                 self.updateStatus(from: connection.status)
             }
         }

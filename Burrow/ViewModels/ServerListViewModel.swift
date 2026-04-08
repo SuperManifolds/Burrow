@@ -7,7 +7,16 @@ final class ServerListViewModel: ObservableObject {
 
     // MARK: - Published State
 
+    struct RelayInfo {
+        let countryCode: String
+        let countryName: String
+        let cityName: String
+        let cityId: String
+    }
+
     @Published private(set) var countries: [RelayCountryGroup] = []
+    /// O(1) lookup from relay hostname to location info.
+    private(set) var relayIndex: [String: RelayInfo] = [:]
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var error: String?
     @Published var searchText: String = ""
@@ -127,12 +136,14 @@ final class ServerListViewModel: ObservableObject {
 
     /// Fetch and group the relay list.
     func loadRelays() async {
+        print("[Burrow] loadRelays called")
         isLoading = true
         error = nil
 
         do {
             let relayList = try await relayService.fetchRelayList()
             countries = relayService.groupedRelays(from: relayList)
+            buildRelayIndex()
             restoreLastSelectedRelay()
             measurePings()
         } catch {
@@ -164,6 +175,7 @@ final class ServerListViewModel: ObservableObject {
         }
         let service = RelayListService(provider: MullvadAPIClient())
         vm.countries = service.groupedRelays(from: relayList)
+        vm.buildRelayIndex()
         var sampleFavourites: Set<String> = []
         for country in vm.countries {
             for city in country.cities {
@@ -180,8 +192,26 @@ final class ServerListViewModel: ObservableObject {
     }
     #endif
 
+    private func buildRelayIndex() {
+        var index: [String: RelayInfo] = [:]
+        for country in countries {
+            for city in country.cities {
+                for relay in city.relays {
+                    index[relay.hostname] = RelayInfo(
+                        countryCode: country.countryCode,
+                        countryName: country.countryName,
+                        cityName: city.cityName,
+                        cityId: city.id
+                    )
+                }
+            }
+        }
+        relayIndex = index
+    }
+
     /// Measure ping to one relay per city.
     private func measurePings() {
+        print("[Burrow Pings] Starting ping measurement for \(countries.flatMap(\.cities).count) cities")
         let targets: [(String, String)] = countries.flatMap { $0.cities }.compactMap { city in
             guard let relay = city.relays.first(where: \.active) else { return nil }
             return (city.id, relay.ipv4AddrIn)
@@ -190,9 +220,12 @@ final class ServerListViewModel: ObservableObject {
         Task.detached { [pingService] in
             let results = await pingService.measureAll(targets)
             await MainActor.run { [weak self] in
+                guard let self else { return }
+                var updated = self.pings
                 for (cityID, ms) in results {
-                    self?.pings[cityID] = ms
+                    updated[cityID] = ms
                 }
+                self.pings = updated
             }
         }
     }

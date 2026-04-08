@@ -57,11 +57,6 @@ struct ConnectionStatusView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "clock")
                             .font(.caption2)
-                            .symbolEffect(
-                                .pulse,
-                                options: .speed(0.3),
-                                isActive: connectionViewModel.status.isActive
-                            )
                         Text(connectionViewModel.formattedDuration)
                             .font(.caption)
                             .fontWeight(.medium)
@@ -103,11 +98,19 @@ struct ConnectionStatusView: View {
             // Action buttons
             if hasDifferentServerSelected {
                 Button {
+                    guard let relay = serverListViewModel.selectedRelay else {
+                        print("[Burrow Switch] No selected relay")
+                        return
+                    }
+                    print("[Burrow Switch] Switching to \(relay.hostname)")
                     Task {
+                        print("[Burrow Switch] Disconnecting...")
                         await connectionViewModel.disconnect()
-                        if let relay = serverListViewModel.selectedRelay {
-                            await connectionViewModel.connect(to: relay)
-                        }
+                        print("[Burrow Switch] Disconnected, status: \(connectionViewModel.status)")
+                        try? await Task.sleep(for: .milliseconds(500))
+                        print("[Burrow Switch] Connecting to \(relay.hostname)...")
+                        await connectionViewModel.connect(to: relay)
+                        print("[Burrow Switch] Connect returned, status: \(connectionViewModel.status)")
                     }
                 } label: {
                     Text(String(localized: "Switch"))
@@ -266,21 +269,10 @@ struct ConnectionStatusView: View {
         return connected.location != selected.location
     }
 
-    /// Find the country and city for a given relay.
-    private func findCity(for relay: Relay) -> (country: RelayCountryGroup, city: RelayCityGroup)? {
-        let countryCode = String(relay.location.prefix(2))
-        for country in serverListViewModel.countries where country.countryCode == countryCode {
-            for city in country.cities where city.relays.contains(where: { $0.hostname == relay.hostname }) {
-                return (country, city)
-            }
-        }
-        return nil
-    }
-
     private func locationText(for relay: Relay) -> String? {
-        guard let match = findCity(for: relay) else { return nil }
-        let flag = match.country.countryCode.countryFlag
-        return "\(flag) \(match.country.countryName) · \(match.city.cityName)"
+        guard let info = serverListViewModel.relayIndex[relay.hostname] else { return nil }
+        let flag = info.countryCode.countryFlag
+        return "\(flag) \(info.countryName) · \(info.cityName)"
     }
 
     /// Resolve connected relay's location.
@@ -298,8 +290,8 @@ struct ConnectionStatusView: View {
     /// Look up ping for the city containing the connected relay.
     private var connectedPing: Int? {
         guard let relay = connectionViewModel.connectedRelay,
-              let match = findCity(for: relay) else { return nil }
-        return serverListViewModel.pings[match.city.id]
+              let info = serverListViewModel.relayIndex[relay.hostname] else { return nil }
+        return serverListViewModel.pings[info.cityId]
     }
 
     private func latencyLabel(_ ms: Int) -> String {

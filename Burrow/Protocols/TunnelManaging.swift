@@ -41,10 +41,10 @@ protocol TunnelManaging: AnyObject {
     func disconnect() async
 
     /// Read diagnostic log from the tunnel extension.
-    func readTunnelLog() -> String?
+    nonisolated func readTunnelLog() -> String?
 
     /// Read transfer statistics (bytes sent/received) from the tunnel extension.
-    func readTransferStats() -> (tx: UInt64, rx: UInt64)?
+    nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)?
 }
 
 // MARK: - Default Parameters
@@ -101,9 +101,9 @@ final class MockTunnelManager: TunnelManaging {
         connectedDate = nil
     }
 
-    func readTunnelLog() -> String? { nil }
+    nonisolated func readTunnelLog() -> String? { nil }
 
-    func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
+    nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
         (tx: 1_207_959_552, rx: 356_515_840) // ~1.12 GB / ~340 MB
     }
 }

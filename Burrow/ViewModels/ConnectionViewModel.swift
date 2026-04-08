@@ -19,7 +19,7 @@ final class ConnectionViewModel: ObservableObject {
     private let tunnelManager: any TunnelManaging
     private let accountViewModel: AccountViewModel
     var settingsViewModel: SettingsViewModel?
-    private var durationTimer: Timer?
+    private var durationTask: Task<Void, Never>?
 
     // MARK: - Initialization
 
@@ -95,25 +95,28 @@ final class ConnectionViewModel: ObservableObject {
     private func startDurationTimer() {
         stopDurationTimer()
         let startDate = Date()
-        durationTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            guard let self else {
-                timer.invalidate()
-                return
-            }
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.connectionDuration = Date().timeIntervalSince(startDate)
-                if let stats = self.tunnelManager.readTransferStats() {
-                    self.transferTx = stats.tx
-                    self.transferRx = stats.rx
+        let manager = tunnelManager
+        durationTask = Task.detached { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard self != nil else { break }
+                let duration = Date().timeIntervalSince(startDate)
+                let stats = manager.readTransferStats()
+                await MainActor.run { [weak self] in
+                    guard let self else { return }
+                    self.connectionDuration = duration
+                    if let stats {
+                        self.transferTx = stats.tx
+                        self.transferRx = stats.rx
+                    }
                 }
             }
         }
     }
 
     private func stopDurationTimer() {
-        durationTimer?.invalidate()
-        durationTimer = nil
+        durationTask?.cancel()
+        durationTask = nil
     }
 }
 

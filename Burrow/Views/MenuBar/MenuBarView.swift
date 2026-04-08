@@ -194,15 +194,10 @@ struct MenuBarView: View {
     }
 
     private var connectedLocationText: String? {
-        guard let relay = connectionViewModel.connectedRelay else { return nil }
-        let countryCode = String(relay.location.prefix(2))
-        for country in serverListViewModel.countries where country.countryCode == countryCode {
-            for city in country.cities where city.relays.contains(where: { $0.hostname == relay.hostname }) {
-                let flag = country.countryCode.countryFlag
-                return "\(flag) \(country.countryName) · \(city.cityName)"
-            }
-        }
-        return nil
+        guard let relay = connectionViewModel.connectedRelay,
+              let info = serverListViewModel.relayIndex[relay.hostname] else { return nil }
+        let flag = info.countryCode.countryFlag
+        return "\(flag) \(info.countryName) · \(info.cityName)"
     }
 
     private func isConnectedToCity(_ city: RelayCityGroup) -> Bool {
