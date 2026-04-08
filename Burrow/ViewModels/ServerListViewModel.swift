@@ -13,9 +13,7 @@ final class ServerListViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var selectedRelay: Relay?
     @Published private(set) var pings: [String: Int] = [:]
-    @Published var favouriteCityIDs: Set<String> {
-        didSet { saveFavourites() }
-    }
+    @Published var favouriteCityIDs: Set<String>
 
     // MARK: - Favourites
 
@@ -48,6 +46,7 @@ final class ServerListViewModel: ObservableObject {
         } else {
             favouriteCityIDs.insert(city.id)
         }
+        saveFavourites()
     }
 
     private static let favouritesKey = "BurrowFavouriteCityIDs"
@@ -130,6 +129,7 @@ final class ServerListViewModel: ObservableObject {
     /// Create a view model pre-populated with relay data from the bundled JSON.
     static func preview() -> ServerListViewModel {
         let vm = ServerListViewModel()
+        vm.favouriteCityIDs = [] // Don't inherit persisted favourites in previews
         guard let url = Bundle.main.url(forResource: "preview_relays", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
             return vm
