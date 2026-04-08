@@ -34,6 +34,7 @@ private struct GeneralSettingsTab: View {
     var body: some View {
         Form {
             Toggle("Launch Burrow at login", isOn: $settingsViewModel.launchAtLogin)
+            Toggle("Auto-connect on launch", isOn: $settingsViewModel.autoConnect)
         }
         .formStyle(.grouped)
     }
@@ -65,6 +66,14 @@ private struct VPNSettingsTab: View {
                         Text(port.displayName).tag(port)
                     }
                 }
+            }
+
+            Section("MTU") {
+                TextField("MTU", value: $settingsViewModel.mtu, formatter: NumberFormatter())
+                    .textFieldStyle(.roundedBorder)
+                Text("Default: 1280. Valid range: 1280–9000.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

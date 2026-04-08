@@ -164,6 +164,18 @@ struct MenuBarView: View {
             }
             .buttonStyle(MenuBarButtonStyle())
 
+            SettingsLink {
+                HStack {
+                    Image(systemName: "gear")
+                    Text(String(localized: "Settings…"))
+                    Spacer()
+                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(MenuBarButtonStyle())
+
             Divider()
                 .padding(.vertical, 4)
 

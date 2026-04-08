@@ -35,6 +35,19 @@ struct ContentView: View {
         .onAppear {
             connectionViewModel.settingsViewModel = settingsViewModel
         }
+        .task {
+            if settingsViewModel.autoConnect,
+               !connectionViewModel.status.isActive,
+               serverListViewModel.selectedRelay == nil {
+                // Wait for relays to load so selectedRelay can be restored
+                while serverListViewModel.countries.isEmpty {
+                    try? await Task.sleep(for: .milliseconds(100))
+                }
+                if let relay = serverListViewModel.selectedRelay {
+                    await connectionViewModel.connect(to: relay)
+                }
+            }
+        }
     }
 }
 

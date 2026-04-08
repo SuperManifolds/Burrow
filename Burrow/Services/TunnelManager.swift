@@ -91,11 +91,12 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         with device: Device,
         privateKey: Data,
         port: Int = 51820,
-        dns: String = "10.64.0.1"
+        dns: String = "10.64.0.1",
+        mtu: Int = 1280
     ) async throws {
         guard let manager = tunnelManager else {
             try await loadTunnelManager()
-            try await connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns)
+            try await connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns, mtu: mtu)
             return
         }
 
@@ -106,6 +107,7 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         protocolConfig.providerConfiguration = [
             "privateKey": privateKey.base64EncodedString(),
             "addresses": "\(device.ipv4Address), \(device.ipv6Address)",
+            "mtu": mtu,
             "dns": dns,
             "peerPublicKey": relay.publicKey,
             "peerEndpoint": "\(relay.ipv4AddrIn):\(port)",

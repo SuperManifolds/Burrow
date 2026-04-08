@@ -58,8 +58,9 @@ final class ConnectionViewModel: ObservableObject {
         do {
             let port = settingsViewModel?.effectivePort ?? 51820
             let dns = settingsViewModel?.effectiveDNS ?? "10.64.0.1"
-            print("[Burrow] Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port))")
-            try await tunnelManager.connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns)
+            let mtu = settingsViewModel?.effectiveMTU ?? 1280
+            print("[Burrow] Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port), MTU:\(mtu))")
+            try await tunnelManager.connect(to: relay, with: device, privateKey: privateKey, port: port, dns: dns, mtu: mtu)
             startDurationTimer()
         } catch {
             self.error = error.localizedDescription

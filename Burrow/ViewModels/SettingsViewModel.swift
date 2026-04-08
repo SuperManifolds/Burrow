@@ -12,6 +12,10 @@ final class SettingsViewModel: ObservableObject {
         didSet { updateLaunchAtLogin() }
     }
 
+    @Published var autoConnect: Bool {
+        didSet { UserDefaults.standard.set(autoConnect, forKey: "auto_connect") }
+    }
+
     // MARK: - VPN Settings
 
     @Published var dnsOption: DNSOption {
@@ -24,6 +28,10 @@ final class SettingsViewModel: ObservableObject {
 
     @Published var wireGuardPort: WireGuardPort {
         didSet { UserDefaults.standard.set(wireGuardPort.rawValue, forKey: "wireguard_port") }
+    }
+
+    @Published var mtu: Int {
+        didSet { UserDefaults.standard.set(mtu, forKey: "mtu_value") }
     }
 
     // MARK: - Device Management
@@ -53,6 +61,10 @@ final class SettingsViewModel: ObservableObject {
         self.wireGuardPort = WireGuardPort(rawValue: portRaw) ?? .automatic
 
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
+        self.autoConnect = UserDefaults.standard.bool(forKey: "auto_connect")
+
+        let savedMTU = UserDefaults.standard.integer(forKey: "mtu_value")
+        self.mtu = savedMTU > 0 ? savedMTU : 1280
     }
 
     // MARK: - Public API
@@ -71,6 +83,9 @@ final class SettingsViewModel: ObservableObject {
     var effectivePort: Int {
         wireGuardPort.portNumber
     }
+
+    /// The MTU value to use for tunnel connections.
+    var effectiveMTU: Int { mtu }
 
     func loadDevices() async {
         guard let token = accountViewModel.credential?.accessToken else { return }
@@ -153,3 +168,4 @@ enum WireGuardPort: Int, CaseIterable, Identifiable {
         }
     }
 }
+

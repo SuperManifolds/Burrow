@@ -162,6 +162,7 @@ struct ServerListView: View {
                 }
             }
             Divider()
+            SettingsLink()
             Button("Log Out") {
                 connectionViewModel.settingsViewModel = nil
                 accountViewModel.logout()

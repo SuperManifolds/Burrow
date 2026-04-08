@@ -29,12 +29,14 @@ protocol TunnelManaging: AnyObject {
     ///   - privateKey: The WireGuard private key (raw 32 bytes).
     ///   - port: The WireGuard port to use.
     ///   - dns: The DNS server address.
+    ///   - mtu: The MTU value for the tunnel interface.
     func connect(
         to relay: Relay,
         with device: Device,
         privateKey: Data,
         port: Int,
-        dns: String
+        dns: String,
+        mtu: Int
     ) async throws
 
     /// Disconnect from the current relay server.
@@ -50,7 +52,7 @@ protocol TunnelManaging: AnyObject {
 // MARK: - Default Parameters
 
 extension TunnelManaging {
-    /// Convenience connect with default port and DNS.
+    /// Convenience connect with default port, DNS, and MTU.
     func connect(
         to relay: Relay,
         with device: Device,
@@ -61,7 +63,8 @@ extension TunnelManaging {
             with: device,
             privateKey: privateKey,
             port: 51820,
-            dns: "10.64.0.1"
+            dns: "10.64.0.1",
+            mtu: 1280
         )
     }
 }
@@ -89,7 +92,8 @@ final class MockTunnelManager: TunnelManaging {
         with device: Device,
         privateKey: Data,
         port: Int,
-        dns: String
+        dns: String,
+        mtu: Int
     ) async throws {
         status = .connecting
         connectedRelay = relay

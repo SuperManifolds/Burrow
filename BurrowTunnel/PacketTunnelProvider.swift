@@ -100,7 +100,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             TunnelLog.write("  peer allowedIPs: \(peer.allowedIPs.map { $0.stringRepresentation })")
         }
 
-        let networkSettings = makeNetworkSettings(from: tunnelConfig)
+        let mtu = providerConfig["mtu"] as? Int
+        let networkSettings = makeNetworkSettings(from: tunnelConfig, mtu: mtu)
         TunnelLog.write("Network settings built, applying...")
         TunnelLog.write("  tunnelRemoteAddress: \(networkSettings.tunnelRemoteAddress)")
         TunnelLog.write("  dns: \(networkSettings.dnsSettings?.servers ?? [])")
@@ -265,7 +266,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     /// Build NEPacketTunnelNetworkSettings from the WireGuard tunnel configuration.
-    private func makeNetworkSettings(from config: TunnelConfiguration) -> NEPacketTunnelNetworkSettings {
+    private func makeNetworkSettings(from config: TunnelConfiguration, mtu: Int? = nil) -> NEPacketTunnelNetworkSettings {
         // Use the actual peer endpoint IP as tunnelRemoteAddress so the system
         // knows to route WireGuard's own traffic via the physical interface.
         let serverAddress: String = {
@@ -287,7 +288,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         // MTU
-        settings.mtu = NSNumber(value: config.interface.mtu ?? 1280)
+        settings.mtu = NSNumber(value: mtu ?? Int(config.interface.mtu ?? 1280))
 
         // IPv4
         var ipv4Routes = [NEIPv4Route]()
