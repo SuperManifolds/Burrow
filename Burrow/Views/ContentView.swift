@@ -39,9 +39,29 @@ struct ContentView: View {
 }
 
 #if DEBUG
-#Preview {
-    let accountVM = AccountViewModel()
-    let connectionVM = ConnectionViewModel(tunnelManager: MockTunnelManager(), accountViewModel: accountVM)
+#Preview("Logged In") {
+    let accountVM = AccountViewModel.preview(loggedIn: true)
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(),
+        accountViewModel: accountVM
+    )
+    let serverListVM = ServerListViewModel.preview()
+    let settingsVM = SettingsViewModel(accountViewModel: accountVM)
+
+    ContentView()
+        .environmentObject(accountVM)
+        .environmentObject(connectionVM)
+        .environmentObject(serverListVM)
+        .environmentObject(settingsVM)
+        .frame(width: 800, height: 600)
+}
+
+#Preview("Logged Out") {
+    let accountVM = AccountViewModel.preview(loggedIn: false)
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(),
+        accountViewModel: accountVM
+    )
     let serverListVM = ServerListViewModel()
     let settingsVM = SettingsViewModel(accountViewModel: accountVM)
 

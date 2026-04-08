@@ -68,3 +68,23 @@ final class SettingsViewModelStore: ObservableObject {
         return vm
     }
 }
+
+#if DEBUG
+#Preview("Main Window") {
+    let accountVM = AccountViewModel.preview(loggedIn: true)
+    let connectionVM = ConnectionViewModel(
+        tunnelManager: MockTunnelManager(),
+        accountViewModel: accountVM
+    )
+    let serverListVM = ServerListViewModel.preview()
+    let settingsVM = SettingsViewModel(accountViewModel: accountVM)
+
+    ContentView()
+        .environmentObject(accountVM)
+        .environmentObject(connectionVM)
+        .environmentObject(serverListVM)
+        .environmentObject(settingsVM)
+        .frame(width: 800, height: 600)
+        .toolbar(.hidden, for: .windowToolbar)
+}
+#endif

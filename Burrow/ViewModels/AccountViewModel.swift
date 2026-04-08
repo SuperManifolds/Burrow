@@ -96,6 +96,15 @@ final class AccountViewModel: ObservableObject {
 
     // MARK: - Private
 
+    #if DEBUG
+    /// Create a view model with a faked logged-in state for SwiftUI previews.
+    static func preview(loggedIn: Bool = true) -> AccountViewModel {
+        let vm = AccountViewModel()
+        vm.isLoggedIn = loggedIn
+        return vm
+    }
+    #endif
+
     private func loadSavedSession() {
         guard let accountData = try? keychain.load(forKey: KeychainService.Key.accountNumber),
               let tokenData = try? keychain.load(forKey: KeychainService.Key.accessToken),
