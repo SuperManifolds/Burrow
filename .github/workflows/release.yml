@@ -27,6 +27,11 @@ jobs:
       - name: Symlink Go to /usr/local/bin
         run: sudo ln -sf "$(which go)" /usr/local/bin/go
 
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
       - name: Install create-dmg
         run: brew install create-dmg
 
