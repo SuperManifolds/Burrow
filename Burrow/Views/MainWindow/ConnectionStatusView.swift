@@ -5,6 +5,7 @@ struct ConnectionStatusView: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
     @State private var iconScale: CGFloat = 1.0
+    @State private var copiedIP: Bool = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -193,10 +194,46 @@ struct ConnectionStatusView: View {
     private var connectionDetailsBar: some View {
         HStack(spacing: 10) {
             ConnectionDetailCard(label: String(localized: "IP Address")) {
-                Text(connectionViewModel.connectedRelay?.ipv4AddrIn ?? "—")
-                    .font(.callout)
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
+                HStack(spacing: 6) {
+                    Text(connectionViewModel.connectedRelay?.ipv4AddrIn ?? "—")
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                    Image(systemName: copiedIP ? "checkmark" : "doc.on.doc")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            }
+            .onTapGesture {
+                if let ip = connectionViewModel.connectedRelay?.ipv4AddrIn {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(ip, forType: .string)
+                    copiedIP = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        copiedIP = false
+                    }
+                }
+            }
+            .overlay(alignment: .top) {
+                if copiedIP {
+                    Text("Copied!")
+                        .font(.caption2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.accent, in: RoundedRectangle(cornerRadius: 4))
+                        .foregroundStyle(.white)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .offset(y: -24)
+                }
+            }
+            .animation(.spring(duration: 0.3), value: copiedIP)
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
             }
 
             ConnectionDetailCard(label: String(localized: "Protocol")) {
