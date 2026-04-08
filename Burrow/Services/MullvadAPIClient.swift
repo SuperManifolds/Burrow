@@ -95,17 +95,26 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
             )
         }
 
+        let bodyString = String(data: data, encoding: .utf8)
+        print("[Burrow API] registerDevice response \(httpResponse.statusCode): \(bodyString ?? "nil")")
+
         switch httpResponse.statusCode {
             case 200, 201:
                 return try decodeResponse(Device.self, from: data)
             case 401:
                 throw MullvadAPIError.unauthorized
-            case 409:
-                throw MullvadAPIError.deviceLimitReached
+            case 400, 409:
+                if bodyString?.contains("MAX_DEVICES_REACHED") == true {
+                    throw MullvadAPIError.deviceLimitReached
+                }
+                throw MullvadAPIError.unexpectedStatus(
+                    code: httpResponse.statusCode,
+                    body: bodyString
+                )
             default:
                 throw MullvadAPIError.unexpectedStatus(
                     code: httpResponse.statusCode,
-                    body: String(data: data, encoding: .utf8)
+                    body: bodyString
                 )
         }
     }

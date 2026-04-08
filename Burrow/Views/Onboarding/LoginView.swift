@@ -31,10 +31,17 @@ struct LoginView: View {
                 TextField("0000 0000 0000 0000", text: $accountViewModel.accountNumber)
                     .textFieldStyle(.plain)
                     .font(.system(size: 24, weight: .medium, design: .monospaced))
-                    .multilineTextAlignment(.center)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize()
+                    .frame(maxWidth: .infinity)
                     .focused($isFieldFocused)
                     .onChange(of: accountViewModel.accountNumber) { _, newValue in
-                        accountViewModel.accountNumber = formatAccountNumber(newValue)
+                        let formatted = formatAccountNumber(newValue)
+                        accountViewModel.accountNumber = formatted
+                        let digits = formatted.replacingOccurrences(of: " ", with: "")
+                        if digits.count == 16 && !accountViewModel.isLoading {
+                            Task { await accountViewModel.login() }
+                        }
                     }
                     .onSubmit {
                         Task { await accountViewModel.login() }
@@ -49,29 +56,34 @@ struct LoginView: View {
 
             // Error message
             if let error = accountViewModel.error {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .padding(.horizontal)
-            }
-
-            // Login button
-            Button {
-                Task { await accountViewModel.login() }
-            } label: {
-                Group {
-                    if accountViewModel.isLoading {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Text("Log In")
+                VStack(spacing: 6) {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                    if accountViewModel.isDeviceLimitError,
+                       let url = URL(string: "https://mullvad.net/en/account/devices") {
+                        Link("Manage devices on mullvad.net", destination: url)
+                            .font(.caption)
                     }
                 }
-                .frame(minWidth: 120)
+                .padding(.horizontal)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(accountViewModel.isLoading || strippedNumber.count != 16)
+
+            if accountViewModel.loginStep != .idle {
+                // Animated login progress
+                loginProgress
+            } else {
+                // Login button
+                Button {
+                    Task { await accountViewModel.login() }
+                } label: {
+                    Text("Log In")
+                        .frame(minWidth: 120)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(accountViewModel.isLoading || strippedNumber.count != 16)
+            }
 
             Spacer()
 
@@ -86,7 +98,68 @@ struct LoginView: View {
             .padding(.bottom, 16)
         }
         .frame(minWidth: 380, minHeight: 420)
+        .animation(.spring(duration: 0.4), value: accountViewModel.loginStep)
         .onAppear { isFieldFocused = true }
+    }
+
+    // MARK: - Login Progress
+
+    private var loginProgress: some View {
+        VStack(spacing: 16) {
+            ForEach(loginSteps, id: \.step) { item in
+                HStack(spacing: 10) {
+                    Group {
+                        if item.step == accountViewModel.loginStep {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else if isStepComplete(item.step) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.accent)
+                        } else {
+                            Image(systemName: "circle")
+                                .foregroundStyle(.quaternary)
+                        }
+                    }
+                    .frame(width: 16, height: 16)
+
+                    Text(item.label)
+                        .font(.subheadline)
+                        .foregroundStyle(
+                            isStepComplete(item.step) || item.step == accountViewModel.loginStep
+                                ? .primary
+                                : .tertiary
+                        )
+
+                    Spacer()
+                }
+                .animation(.spring(duration: 0.3), value: accountViewModel.loginStep)
+            }
+        }
+        .frame(width: 200)
+    }
+
+    private struct LoginStepInfo {
+        let step: AccountViewModel.LoginStep
+        let label: String
+    }
+
+    private var loginSteps: [LoginStepInfo] {
+        [
+            LoginStepInfo(step: .authenticating, label: String(localized: "Authenticating...")),
+            LoginStepInfo(step: .generatingKeys, label: String(localized: "Generating keys...")),
+            LoginStepInfo(step: .registeringDevice, label: String(localized: "Registering device...")),
+            LoginStepInfo(step: .ready, label: String(localized: "Ready!"))
+        ]
+    }
+
+    private var stepOrder: [AccountViewModel.LoginStep] {
+        [.authenticating, .generatingKeys, .registeringDevice, .ready]
+    }
+
+    private func isStepComplete(_ step: AccountViewModel.LoginStep) -> Bool {
+        guard let currentIndex = stepOrder.firstIndex(of: accountViewModel.loginStep),
+              let stepIndex = stepOrder.firstIndex(of: step) else { return false }
+        return stepIndex < currentIndex
     }
 
     // MARK: - Helpers
@@ -110,6 +183,12 @@ struct LoginView: View {
     }
 }
 
-#Preview {
+#if DEBUG
+#Preview("Login") {
     LoginView(accountViewModel: AccountViewModel())
 }
+
+#Preview("Registering") {
+    LoginView(accountViewModel: AccountViewModel.preview(loggedIn: false, loginStep: .registeringDevice))
+}
+#endif

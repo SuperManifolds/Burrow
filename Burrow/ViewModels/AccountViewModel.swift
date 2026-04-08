@@ -7,10 +7,20 @@ final class AccountViewModel: ObservableObject {
 
     // MARK: - Published State
 
+    enum LoginStep: Equatable {
+        case idle
+        case authenticating
+        case generatingKeys
+        case registeringDevice
+        case ready
+    }
+
     @Published var accountNumber: String = ""
     @Published private(set) var isLoggedIn: Bool = false
     @Published private(set) var isLoading: Bool = false
+    @Published private(set) var loginStep: LoginStep = .idle
     @Published private(set) var error: String?
+    @Published private(set) var isDeviceLimitError: Bool = false
     @Published private(set) var credential: AccountCredential?
     @Published private(set) var device: Device?
 
@@ -42,42 +52,78 @@ final class AccountViewModel: ObservableObject {
 
         isLoading = true
         error = nil
+        isDeviceLimitError = false
+        loginStep = .authenticating
+        print("[Burrow Login] Starting login for account \(cleaned.prefix(4))****")
 
         do {
             // Authenticate
+            print("[Burrow Login] Authenticating...")
             let cred = try await apiClient.authenticate(accountNumber: cleaned)
             credential = cred
+            print("[Burrow Login] Authenticated, token expires \(cred.expiry)")
 
             // Save account number and token
             try keychain.save(Data(cleaned.utf8), forKey: KeychainService.Key.accountNumber)
             try keychain.save(Data(cred.accessToken.utf8), forKey: KeychainService.Key.accessToken)
 
-            // Generate keypair and register device
+            // Generate keypair
+            loginStep = .generatingKeys
+            print("[Burrow Login] Generating keypair...")
             let keyPair = KeyPairGenerator.generateKeyPair()
             try keychain.save(keyPair.privateKey, forKey: KeychainService.Key.privateKey)
+            print("[Burrow Login] Keypair generated, public key: \(keyPair.publicKeyBase64.prefix(8))...")
 
+            // Register device
+            loginStep = .registeringDevice
+            print("[Burrow Login] Registering device...")
             let dev = try await apiClient.registerDevice(
                 token: cred.accessToken,
                 publicKey: keyPair.publicKeyBase64
             )
             device = dev
+            print("[Burrow Login] Device registered: \(dev.name) (\(dev.id))")
 
             // Save device info
             let deviceData = try JSONEncoder().encode(dev)
             try keychain.save(deviceData, forKey: KeychainService.Key.deviceInfo)
 
+            // Brief pause on "Ready!" before transitioning
+            loginStep = .ready
+            print("[Burrow Login] Ready!")
+            try? await Task.sleep(for: .seconds(1))
+
             isLoggedIn = true
         } catch let apiError as MullvadAPIError {
+            print("[Burrow Login] API error: \(apiError.errorDescription ?? "unknown")")
+            loginStep = .idle
             error = apiError.errorDescription
+            if case .deviceLimitReached = apiError {
+                isDeviceLimitError = true
+            }
         } catch {
+            print("[Burrow Login] Error: \(error)")
+            loginStep = .idle
             self.error = error.localizedDescription
         }
 
         isLoading = false
     }
 
-    /// Log out and clear all stored credentials.
+    /// Log out, unregister the device, and clear all stored credentials.
     func logout() {
+        // Remove device from Mullvad in the background
+        if let token = credential?.accessToken, let deviceID = device?.id {
+            Task {
+                do {
+                    try await apiClient.removeDevice(token: token, deviceID: deviceID)
+                    print("[Burrow Logout] Device \(deviceID) removed")
+                } catch {
+                    print("[Burrow Logout] Failed to remove device: \(error)")
+                }
+            }
+        }
+
         try? keychain.delete(forKey: KeychainService.Key.accountNumber)
         try? keychain.delete(forKey: KeychainService.Key.accessToken)
         try? keychain.delete(forKey: KeychainService.Key.privateKey)
@@ -98,9 +144,10 @@ final class AccountViewModel: ObservableObject {
 
     #if DEBUG
     /// Create a view model with a faked logged-in state for SwiftUI previews.
-    static func preview(loggedIn: Bool = true) -> AccountViewModel {
+    static func preview(loggedIn: Bool = true, loginStep: LoginStep = .idle) -> AccountViewModel {
         let vm = AccountViewModel()
         vm.isLoggedIn = loggedIn
+        vm.loginStep = loginStep
         return vm
     }
     #endif
