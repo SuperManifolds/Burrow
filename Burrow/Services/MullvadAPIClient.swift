@@ -1,7 +1,31 @@
 import Foundation
 
-/// Concrete implementation of `APIClientProtocol` for Mullvad's REST API.
-final class MullvadAPIClient: APIClientProtocol, Sendable {
+/// Mullvad VPN provider implementation.
+final class MullvadAPIClient: VPNProvider, Sendable {
+
+    // MARK: - Provider Info
+
+    let providerName = "Mullvad"
+    let accountInputPlaceholder = "0000 0000 0000 0000"
+    let accountInputMaxLength = 19 // 16 digits + 3 spaces
+
+    func formatAccountInput(_ input: String) -> String {
+        let digits = input.filter(\.isNumber)
+        let limited = String(digits.prefix(16))
+        var result = ""
+        for (index, char) in limited.enumerated() {
+            if index > 0 && index % 4 == 0 {
+                result.append(" ")
+            }
+            result.append(char)
+        }
+        return result
+    }
+
+    func validateAccountInput(_ input: String) -> Bool {
+        let digits = input.filter(\.isNumber)
+        return digits.count == 16 && digits.allSatisfy(\.isNumber)
+    }
 
     // MARK: - Properties
 
@@ -20,7 +44,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         self.decoder = decoder
     }
 
-    // MARK: - APIClientProtocol
+    // MARK: - VPNProvider
 
     func authenticate(accountNumber: String) async throws -> AccountCredential {
         let url = baseURL.appendingPathComponent("auth/v1/token")
@@ -34,9 +58,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         let (data, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw MullvadAPIError.networkError(
-                underlying: URLError(.badServerResponse)
-            )
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
         }
 
         switch httpResponse.statusCode {
@@ -45,14 +67,13 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
 
                 let isoFormatter = ISO8601DateFormatter()
                 isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                // Try with fractional seconds first, then without
                 let expiry = isoFormatter.date(from: tokenResponse.expiry) ?? {
                     let fallback = ISO8601DateFormatter()
                     fallback.formatOptions = [.withInternetDateTime]
                     return fallback.date(from: tokenResponse.expiry)
                 }()
                 guard let expiry else {
-                    throw MullvadAPIError.decodingError(
+                    throw VPNProviderError.decodingError(
                         underlying: DecodingError.dataCorrupted(
                             .init(codingPath: [], debugDescription: "Invalid expiry date format")
                         )
@@ -65,11 +86,10 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
                     expiry: expiry
                 )
             case 400, 401:
-                throw MullvadAPIError.invalidAccount
+                throw VPNProviderError.invalidCredentials
             default:
-                throw MullvadAPIError.unexpectedStatus(
-                    code: httpResponse.statusCode,
-                    body: String(data: data, encoding: .utf8)
+                throw VPNProviderError.providerError(
+                    message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
                 )
         }
     }
@@ -90,9 +110,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         let (data, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw MullvadAPIError.networkError(
-                underlying: URLError(.badServerResponse)
-            )
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
         }
 
         let bodyString = String(data: data, encoding: .utf8)
@@ -102,19 +120,17 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
             case 200, 201:
                 return try decodeResponse(Device.self, from: data)
             case 401:
-                throw MullvadAPIError.unauthorized
+                throw VPNProviderError.unauthorized
             case 400, 409:
                 if bodyString?.contains("MAX_DEVICES_REACHED") == true {
-                    throw MullvadAPIError.deviceLimitReached
+                    throw VPNProviderError.deviceLimitReached(limit: 5)
                 }
-                throw MullvadAPIError.unexpectedStatus(
-                    code: httpResponse.statusCode,
-                    body: bodyString
+                throw VPNProviderError.providerError(
+                    message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
                 )
             default:
-                throw MullvadAPIError.unexpectedStatus(
-                    code: httpResponse.statusCode,
-                    body: bodyString
+                throw VPNProviderError.providerError(
+                    message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
                 )
         }
     }
@@ -126,15 +142,12 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         let (data, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw MullvadAPIError.networkError(
-                underlying: URLError(.badServerResponse)
-            )
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
         }
 
         guard httpResponse.statusCode == 200 else {
-            throw MullvadAPIError.unexpectedStatus(
-                code: httpResponse.statusCode,
-                body: String(data: data, encoding: .utf8)
+            throw VPNProviderError.providerError(
+                message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
             )
         }
 
@@ -149,18 +162,17 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         let (data, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw MullvadAPIError.networkError(underlying: URLError(.badServerResponse))
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
         }
 
         switch httpResponse.statusCode {
             case 200:
                 return try decodeResponse([Device].self, from: data)
             case 401:
-                throw MullvadAPIError.unauthorized
+                throw VPNProviderError.unauthorized
             default:
-                throw MullvadAPIError.unexpectedStatus(
-                    code: httpResponse.statusCode,
-                    body: String(data: data, encoding: .utf8)
+                throw VPNProviderError.providerError(
+                    message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
                 )
         }
     }
@@ -174,18 +186,17 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         let (data, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw MullvadAPIError.networkError(underlying: URLError(.badServerResponse))
+            throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))
         }
 
         switch httpResponse.statusCode {
             case 200, 204:
                 return
             case 401:
-                throw MullvadAPIError.unauthorized
+                throw VPNProviderError.unauthorized
             default:
-                throw MullvadAPIError.unexpectedStatus(
-                    code: httpResponse.statusCode,
-                    body: String(data: data, encoding: .utf8)
+                throw VPNProviderError.providerError(
+                    message: String(localized: "Server returned an unexpected response (HTTP \(httpResponse.statusCode)).")
                 )
         }
     }
@@ -196,7 +207,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         do {
             return try await session.data(for: request)
         } catch {
-            throw MullvadAPIError.networkError(underlying: error)
+            throw VPNProviderError.networkError(underlying: error)
         }
     }
 
@@ -204,7 +215,7 @@ final class MullvadAPIClient: APIClientProtocol, Sendable {
         do {
             return try decoder.decode(type, from: data)
         } catch {
-            throw MullvadAPIError.decodingError(underlying: error)
+            throw VPNProviderError.decodingError(underlying: error)
         }
     }
 }

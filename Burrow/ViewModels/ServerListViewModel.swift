@@ -118,8 +118,8 @@ final class ServerListViewModel: ObservableObject {
 
     // MARK: - Initialization
 
-    init(apiClient: APIClientProtocol = MullvadAPIClient()) {
-        self.relayService = RelayListService(apiClient: apiClient)
+    init(provider: VPNProvider = MullvadAPIClient()) {
+        self.relayService = RelayListService(provider: provider)
         self.favouriteCityIDs = Self.loadFavourites()
     }
 
@@ -162,7 +162,7 @@ final class ServerListViewModel: ObservableObject {
         guard let relayList = try? decoder.decode(RelayList.self, from: data) else {
             return vm
         }
-        let service = RelayListService(apiClient: MullvadAPIClient())
+        let service = RelayListService(provider: MullvadAPIClient())
         vm.countries = service.groupedRelays(from: relayList)
         var sampleFavourites: Set<String> = []
         for country in vm.countries {

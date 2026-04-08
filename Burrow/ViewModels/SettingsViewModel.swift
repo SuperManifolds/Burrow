@@ -34,13 +34,13 @@ final class SettingsViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let apiClient: APIClientProtocol
+    private let provider: VPNProvider
     private let accountViewModel: AccountViewModel
 
     // MARK: - Initialization
 
-    init(apiClient: APIClientProtocol = MullvadAPIClient(), accountViewModel: AccountViewModel) {
-        self.apiClient = apiClient
+    init(provider: VPNProvider = MullvadAPIClient(), accountViewModel: AccountViewModel) {
+        self.provider = provider
         self.accountViewModel = accountViewModel
 
         // Load persisted settings
@@ -79,7 +79,7 @@ final class SettingsViewModel: ObservableObject {
         deviceError = nil
 
         do {
-            devices = try await apiClient.listDevices(token: token)
+            devices = try await provider.listDevices(token: token)
         } catch {
             deviceError = error.localizedDescription
         }
@@ -91,7 +91,7 @@ final class SettingsViewModel: ObservableObject {
         guard let token = accountViewModel.credential?.accessToken else { return }
 
         do {
-            try await apiClient.removeDevice(token: token, deviceID: device.id)
+            try await provider.removeDevice(token: token, deviceID: device.id)
             devices.removeAll { $0.id == device.id }
         } catch {
             deviceError = error.localizedDescription

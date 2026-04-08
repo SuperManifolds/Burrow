@@ -28,7 +28,7 @@ struct LoginView: View {
 
             // Account number field
             VStack(spacing: 8) {
-                TextField("0000 0000 0000 0000", text: $accountViewModel.accountNumber)
+                TextField(accountViewModel.provider.accountInputPlaceholder, text: $accountViewModel.accountNumber)
                     .textFieldStyle(.plain)
                     .font(.system(size: 24, weight: .medium, design: .monospaced))
                     .multilineTextAlignment(.leading)
@@ -36,10 +36,10 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity)
                     .focused($isFieldFocused)
                     .onChange(of: accountViewModel.accountNumber) { _, newValue in
-                        let formatted = formatAccountNumber(newValue)
+                        let formatted = accountViewModel.provider.formatAccountInput(newValue)
                         accountViewModel.accountNumber = formatted
-                        let digits = formatted.replacingOccurrences(of: " ", with: "")
-                        if digits.count == 16 && !accountViewModel.isLoading {
+                        if accountViewModel.provider.validateAccountInput(formatted)
+                            && !accountViewModel.isLoading {
                             Task { await accountViewModel.login() }
                         }
                     }
@@ -82,7 +82,10 @@ struct LoginView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(accountViewModel.isLoading || strippedNumber.count != 16)
+                .disabled(
+                    accountViewModel.isLoading
+                        || !accountViewModel.provider.validateAccountInput(accountViewModel.accountNumber)
+                )
             }
 
             Spacer()
@@ -162,25 +165,6 @@ struct LoginView: View {
         return stepIndex < currentIndex
     }
 
-    // MARK: - Helpers
-
-    private var strippedNumber: String {
-        accountViewModel.accountNumber.replacingOccurrences(of: " ", with: "")
-    }
-
-    /// Format as groups of 4 digits: "1234 5678 9012 3456"
-    private func formatAccountNumber(_ input: String) -> String {
-        let digits = input.filter(\.isNumber)
-        let limited = String(digits.prefix(16))
-        var result = ""
-        for (index, char) in limited.enumerated() {
-            if index > 0 && index % 4 == 0 {
-                result.append(" ")
-            }
-            result.append(char)
-        }
-        return result
-    }
 }
 
 #if DEBUG

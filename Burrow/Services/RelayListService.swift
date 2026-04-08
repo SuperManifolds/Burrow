@@ -5,7 +5,7 @@ actor RelayListService {
 
     // MARK: - Properties
 
-    private let apiClient: APIClientProtocol
+    private let provider: VPNProvider
     private let cacheURL: URL
     private let cacheMaxAge: TimeInterval
 
@@ -15,11 +15,11 @@ actor RelayListService {
     // MARK: - Initialization
 
     init(
-        apiClient: APIClientProtocol,
+        provider: VPNProvider,
         cacheDirectory: URL? = nil,
         cacheMaxAge: TimeInterval = 3600 // 1 hour
     ) {
-        self.apiClient = apiClient
+        self.provider = provider
         self.cacheMaxAge = cacheMaxAge
 
         let directory: URL
@@ -49,7 +49,7 @@ actor RelayListService {
         }
 
         // Fetch from API
-        let relayList = try await apiClient.fetchRelayList()
+        let relayList = try await provider.fetchRelayList()
         cachedRelayList = relayList
         lastFetchDate = Date()
 

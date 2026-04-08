@@ -26,27 +26,27 @@ final class AccountViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let apiClient: APIClientProtocol
+    let provider: VPNProvider
     private let keychain: KeychainStoring
 
     // MARK: - Initialization
 
     init(
-        apiClient: APIClientProtocol = MullvadAPIClient(),
+        provider: VPNProvider = MullvadAPIClient(),
         keychain: KeychainStoring = KeychainService()
     ) {
-        self.apiClient = apiClient
+        self.provider = provider
         self.keychain = keychain
         loadSavedSession()
     }
 
     // MARK: - Public API
 
-    /// Log in with a 16-digit Mullvad account number.
+    /// Log in with the provider's account credentials.
     func login() async {
         let cleaned = accountNumber.replacingOccurrences(of: " ", with: "")
-        guard cleaned.count == 16, cleaned.allSatisfy(\.isNumber) else {
-            error = String(localized: "Account number must be 16 digits.")
+        guard provider.validateAccountInput(cleaned) else {
+            error = String(localized: "Invalid account input. Please check and try again.")
             return
         }
 
@@ -59,7 +59,7 @@ final class AccountViewModel: ObservableObject {
         do {
             // Authenticate
             print("[Burrow Login] Authenticating...")
-            let cred = try await apiClient.authenticate(accountNumber: cleaned)
+            let cred = try await provider.authenticate(accountNumber: cleaned)
             credential = cred
             print("[Burrow Login] Authenticated, token expires \(cred.expiry)")
 
@@ -77,7 +77,7 @@ final class AccountViewModel: ObservableObject {
             // Register device
             loginStep = .registeringDevice
             print("[Burrow Login] Registering device...")
-            let dev = try await apiClient.registerDevice(
+            let dev = try await provider.registerDevice(
                 token: cred.accessToken,
                 publicKey: keyPair.publicKeyBase64
             )
@@ -94,11 +94,11 @@ final class AccountViewModel: ObservableObject {
             try? await Task.sleep(for: .seconds(1))
 
             isLoggedIn = true
-        } catch let apiError as MullvadAPIError {
-            print("[Burrow Login] API error: \(apiError.errorDescription ?? "unknown")")
+        } catch let providerError as VPNProviderError {
+            print("[Burrow Login] Provider error: \(providerError.errorDescription ?? "unknown")")
             loginStep = .idle
-            error = apiError.errorDescription
-            if case .deviceLimitReached = apiError {
+            error = providerError.errorDescription
+            if case .deviceLimitReached = providerError {
                 isDeviceLimitError = true
             }
         } catch {
@@ -112,11 +112,10 @@ final class AccountViewModel: ObservableObject {
 
     /// Log out, unregister the device, and clear all stored credentials.
     func logout() {
-        // Remove device from Mullvad in the background
         if let token = credential?.accessToken, let deviceID = device?.id {
             Task {
                 do {
-                    try await apiClient.removeDevice(token: token, deviceID: deviceID)
+                    try await provider.removeDevice(token: token, deviceID: deviceID)
                     print("[Burrow Logout] Device \(deviceID) removed")
                 } catch {
                     print("[Burrow Logout] Failed to remove device: \(error)")
@@ -143,7 +142,6 @@ final class AccountViewModel: ObservableObject {
     // MARK: - Private
 
     #if DEBUG
-    /// Create a view model with a faked logged-in state for SwiftUI previews.
     static func preview(loggedIn: Bool = true, loginStep: LoginStep = .idle) -> AccountViewModel {
         let vm = AccountViewModel()
         vm.isLoggedIn = loggedIn
