@@ -9,7 +9,7 @@ import WireGuardKit
 private enum TunnelLog {
     static let logURL: URL? = {
         FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.burrow.vpn")?
+            .containerURL(forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup)?
             .appendingPathComponent("tunnel.log")
     }()
 
@@ -347,9 +347,9 @@ enum PacketTunnelError: LocalizedError {
     var errorDescription: String? {
         switch self {
             case .missingConfiguration:
-                return "No WireGuard configuration found in tunnel provider settings."
+                return String(localized: "No WireGuard configuration found in tunnel provider settings.")
             case .invalidConfiguration:
-                return "The WireGuard configuration could not be parsed."
+                return String(localized: "The WireGuard configuration could not be parsed.")
         }
     }
 }

@@ -22,10 +22,10 @@ final class TunnelManager: ObservableObject, TunnelManaging {
     private var statusObserver: NSObjectProtocol?
 
     /// The bundle identifier for the Network Extension target.
-    private let tunnelBundleIdentifier = "io.sorlie.Burrow.BurrowTunnel"
+    private let tunnelBundleIdentifier = AppIdentifiers.tunnelBundleID
 
     /// The app group used to share data between the app and extension.
-    private let appGroupIdentifier = "group.com.burrow.vpn"
+    private let appGroupIdentifier = AppIdentifiers.appGroup
 
     /// Read the diagnostic log from the tunnel extension.
     func readTunnelLog() -> String? {
@@ -153,7 +153,7 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         var errorDescription: String? {
             switch self {
                 case .invalidSession:
-                    return "Failed to create tunnel session."
+                    return String(localized: "Failed to create tunnel session.")
             }
         }
     }

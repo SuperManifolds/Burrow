@@ -21,13 +21,13 @@ enum ConnectionStatus: Sendable, Equatable {
     var displayText: String {
         switch self {
             case .disconnected:
-                return "Disconnected"
+                return String(localized: "Disconnected")
             case .connecting:
-                return "Connecting..."
+                return String(localized: "Connecting...")
             case .connected:
-                return "Connected"
+                return String(localized: "Connected")
             case .disconnecting:
-                return "Disconnecting..."
+                return String(localized: "Disconnecting...")
         }
     }
 }

@@ -124,8 +124,8 @@ enum DNSOption: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-            case .mullvad: return "Mullvad DNS (10.64.0.1)"
-            case .custom: return "Custom"
+            case .mullvad: return String(localized: "Mullvad DNS (10.64.0.1)")
+            case .custom: return String(localized: "Custom")
         }
     }
 }
@@ -139,7 +139,7 @@ enum WireGuardPort: Int, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-            case .automatic: return "Automatic"
+            case .automatic: return String(localized: "Automatic")
             case .port51820: return "51820"
             case .port53: return "53"
         }

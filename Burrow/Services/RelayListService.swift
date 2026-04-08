@@ -28,10 +28,10 @@ actor RelayListService {
         } else if let caches = FileManager.default.urls(
             for: .cachesDirectory, in: .userDomainMask
         ).first {
-            directory = caches.appendingPathComponent("com.burrow.vpn", isDirectory: true)
+            directory = caches.appendingPathComponent(AppIdentifiers.bundleID, isDirectory: true)
         } else {
             directory = FileManager.default.temporaryDirectory
-                .appendingPathComponent("com.burrow.vpn", isDirectory: true)
+                .appendingPathComponent(AppIdentifiers.bundleID, isDirectory: true)
         }
 
         self.cacheURL = directory.appendingPathComponent("relays.json")
