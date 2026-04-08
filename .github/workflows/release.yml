@@ -95,6 +95,8 @@ jobs:
             -destination 'generic/platform=macOS' \
             -archivePath $RUNNER_TEMP/Burrow.xcarchive \
             -skipPackagePluginValidation \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
