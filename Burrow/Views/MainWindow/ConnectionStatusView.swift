@@ -28,7 +28,7 @@ struct ConnectionStatusView: View {
                         .font(.caption)
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
-                        .accessibilityLabel("Connected for \(connectionViewModel.formattedDuration)")
+                        .accessibilityLabel(String(localized: "Connected for \(connectionViewModel.formattedDuration)"))
                 }
 
                 if let relay = connectionViewModel.connectedRelay {
@@ -48,7 +48,7 @@ struct ConnectionStatusView: View {
                     }
                 }
             } label: {
-                Text(connectionViewModel.status.isActive ? "Disconnect" : "Connect")
+                Text(connectionViewModel.status.isActive ? String(localized: "Disconnect") : String(localized: "Connect"))
                     .frame(minWidth: 140)
             }
             .buttonStyle(.borderedProminent)

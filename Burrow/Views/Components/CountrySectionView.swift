@@ -25,7 +25,7 @@ struct CountrySectionView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("\(city.cityName), \(city.activeRelayCount) servers")
+                .accessibilityLabel(String(localized: "\(city.cityName), \(city.activeRelayCount) servers"))
             }
         } label: {
             HStack(spacing: 8) {

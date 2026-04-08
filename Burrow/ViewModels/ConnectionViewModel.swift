@@ -42,13 +42,13 @@ final class ConnectionViewModel: ObservableObject {
         error = nil
 
         guard let device = accountViewModel.device else {
-            error = "No device registered. Try logging out and back in."
+            error = String(localized: "No device registered. Try logging out and back in.")
             print("[Burrow] Connect failed: no device")
             return
         }
 
         guard let privateKey = accountViewModel.privateKey() else {
-            error = "Missing private key. Try logging out and back in."
+            error = String(localized: "Missing private key. Try logging out and back in.")
             print("[Burrow] Connect failed: no private key")
             return
         }

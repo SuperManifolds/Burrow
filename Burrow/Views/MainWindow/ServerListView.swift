@@ -86,7 +86,7 @@ struct ServerListView: View {
         } label: {
             Image(systemName: "person.circle")
         }
-        .accessibilityLabel("Account menu")
+        .accessibilityLabel(String(localized: "Account menu"))
     }
 
     // MARK: - Helpers

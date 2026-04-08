@@ -36,7 +36,7 @@ final class AccountViewModel: ObservableObject {
     func login() async {
         let cleaned = accountNumber.replacingOccurrences(of: " ", with: "")
         guard cleaned.count == 16, cleaned.allSatisfy(\.isNumber) else {
-            error = "Account number must be 16 digits."
+            error = String(localized: "Account number must be 16 digits.")
             return
         }
 

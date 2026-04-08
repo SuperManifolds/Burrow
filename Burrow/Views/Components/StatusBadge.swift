@@ -21,6 +21,6 @@ struct StatusBadge: View {
                 .fill(Color.connectionStatus(status).opacity(0.15))
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("VPN status: \(status.displayText)")
+        .accessibilityLabel(String(localized: "VPN status: \(status.displayText)"))
     }
 }
