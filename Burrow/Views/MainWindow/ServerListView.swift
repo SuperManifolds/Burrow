@@ -125,7 +125,11 @@ struct ServerListView: View {
         .task {
             if serverListViewModel.countries.isEmpty {
                 await serverListViewModel.loadRelays()
+                expandCountryForSelectedRelay()
             }
+        }
+        .onChange(of: serverListViewModel.selectedRelay?.hostname) {
+            expandCountryForSelectedRelay()
         }
     }
 
@@ -194,6 +198,16 @@ struct ServerListView: View {
             serverListViewModel.saveSelectedRelay()
             Task {
                 await connectionViewModel.connect(to: relay)
+            }
+        }
+    }
+
+    private func expandCountryForSelectedRelay() {
+        guard let selected = serverListViewModel.selectedRelay else { return }
+        let countryCode = String(selected.location.prefix(2))
+        DispatchQueue.main.async {
+            if let country = serverListViewModel.countries.first(where: { $0.countryCode == countryCode }) {
+                expandedCountries.insert(country.id)
             }
         }
     }
