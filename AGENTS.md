@@ -4,12 +4,6 @@
 
 - Write clear, professional commit messages that focus on what changed and why
 - Use conventional commit style
-- Do not include Claude Code attribution in commit messages
-
-## Communication Style
-
-- Be concise and direct
-- Avoid unnecessary preamble or postamble
 
 ## Code Changes
 
