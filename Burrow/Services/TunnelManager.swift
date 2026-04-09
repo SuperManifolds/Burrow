@@ -196,9 +196,3 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         }
     }
 }
-
-/// JSON structure for transfer stats shared between app and tunnel extension.
-struct TransferStats: Codable {
-    let tx: UInt64
-    let rx: UInt64
-}

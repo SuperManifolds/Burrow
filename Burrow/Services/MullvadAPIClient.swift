@@ -183,7 +183,7 @@ final class MullvadAPIClient: VPNProvider, Sendable {
         request.httpMethod = "DELETE"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
-        let (data, response) = try await performRequest(request)
+        let (_, response) = try await performRequest(request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw VPNProviderError.networkError(underlying: URLError(.badServerResponse))

@@ -49,7 +49,6 @@ protocol TunnelManaging: AnyObject {
     nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)?
 }
 
-
 // MARK: - Mock for Previews and Tests
 
 #if DEBUG
