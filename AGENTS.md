@@ -37,6 +37,7 @@
 - Wrap previews in `#if DEBUG` / `#endif`
 - Use `.environmentObject` and `@ObservedObject` patterns consistent with the existing codebase
 - Use shared color extensions (e.g. `Color.ping(_:)`, `Color.connectionStatus(_:)`) instead of duplicating color logic
+- Do not extract sub-views into `private var` computed properties — keep view code inline or extract into separate component structs
 
 ## Design Philosophy
 
