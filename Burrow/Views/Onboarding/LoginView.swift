@@ -14,6 +14,7 @@ struct LoginView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 96, height: 96)
+                    .accessibilityHidden(true)
                     .scaleEffect(iconBreathing ? 1.03 : 1.0)
                     .animation(
                         .easeInOut(duration: 2.0).repeatForever(autoreverses: true),
@@ -41,6 +42,7 @@ struct LoginView: View {
                        let url = URL(string: "https://mullvad.net/en/account/devices") {
                         Link("Manage devices on mullvad.net", destination: url)
                             .font(.caption)
+                            .accessibilityHint(String(localized: "Opens Mullvad website to remove devices"))
                     }
                 }
                 .padding(.horizontal)

@@ -57,6 +57,7 @@ private struct VPNSettingsTab: View {
                 if settingsViewModel.dnsOption == .custom {
                     TextField("DNS Address", text: $settingsViewModel.customDNS)
                         .textFieldStyle(.roundedBorder)
+                        .accessibilityHint(String(localized: "Enter the IP address of your custom DNS server"))
                 }
             }
 
@@ -71,9 +72,11 @@ private struct VPNSettingsTab: View {
             Section("MTU") {
                 TextField("MTU", value: $settingsViewModel.mtu, formatter: NumberFormatter())
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityHint(String(localized: "Maximum transmission unit size. Valid range: 1280 to 9000"))
                 Text("Default: \(TunnelDefaults.mtu). Valid range: 1280–9000.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
             }
         }
         .formStyle(.grouped)
@@ -195,6 +198,7 @@ private struct DeviceRow: View {
                     Image(systemName: "trash")
                 }
                 .buttonStyle(.borderless)
+                .accessibilityLabel(String(localized: "Remove \(device.name)"))
                 .confirmationDialog(
                     "Remove \(device.name)?",
                     isPresented: $showConfirmation,

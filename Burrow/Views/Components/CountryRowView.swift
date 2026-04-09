@@ -15,6 +15,7 @@ struct CountryRowView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .frame(width: 10)
+                    .accessibilityHidden(true)
 
                 Text(country.countryCode.countryFlag)
 
@@ -30,6 +31,10 @@ struct CountryRowView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(country.countryName), \(country.cities.count) cities")
+        .accessibilityHint(isExpanded
+            ? String(localized: "Double tap to collapse")
+            : String(localized: "Double tap to expand"))
     }
 }
 

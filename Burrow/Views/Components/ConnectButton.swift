@@ -23,6 +23,7 @@ struct ConnectButton: View {
         .controlSize(.large)
         .hoverScale()
         .disabled(isDisabled)
+        .accessibilityHint(isDisabled ? String(localized: "Select a server first") : "")
     }
 }
 

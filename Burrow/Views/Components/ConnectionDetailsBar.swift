@@ -46,6 +46,7 @@ struct ConnectionDetailsBar: View {
                 }
             }
             .animation(.spring(duration: 0.3), value: copiedIP)
+            .accessibilityHint(String(localized: "Double tap to copy IP address"))
             .onHover { hovering in
                 if hovering {
                     NSCursor.pointingHand.push()
@@ -67,6 +68,7 @@ struct ConnectionDetailsBar: View {
                             .font(.callout)
                             .fontWeight(.semibold)
                             .monospacedDigit()
+                            .accessibilityLabel(String(localized: "Latency: \(ping) milliseconds"))
                         Text(latencyLabel(ping))
                             .font(.caption2)
                             .fontWeight(.medium)
@@ -90,10 +92,12 @@ struct ConnectionDetailsBar: View {
                         .font(.callout)
                         .fontWeight(.medium)
                         .foregroundStyle(Color(.systemGreen))
+                        .accessibilityLabel(String(localized: "Upload: \(ConnectionViewModel.formattedBytes(transferTx))"))
                     Text("↓ \(ConnectionViewModel.formattedBytes(transferRx))")
                         .font(.callout)
                         .fontWeight(.medium)
                         .foregroundStyle(Color(.systemBlue))
+                        .accessibilityLabel(String(localized: "Download: \(ConnectionViewModel.formattedBytes(transferRx))"))
                 }
             }
         }

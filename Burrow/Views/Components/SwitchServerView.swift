@@ -35,6 +35,8 @@ struct SwitchServerView: View {
         .controlSize(.large)
         .hoverScale()
         .transition(.scale.combined(with: .opacity))
+        .accessibilityLabel(String(localized: "Switch to selected server"))
+        .accessibilityHint(String(localized: "Disconnect and connect to the selected server"))
     }
 }
 

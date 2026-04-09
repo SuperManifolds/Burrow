@@ -23,6 +23,7 @@ struct LoginProgressView: View {
                         }
                     }
                     .frame(width: 16, height: 16)
+                    .accessibilityHidden(true)
 
                     Text(item.label)
                         .font(.subheadline)
@@ -34,6 +35,12 @@ struct LoginProgressView: View {
 
                     Spacer()
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityValue(
+                    isStepComplete(item.step) ? String(localized: "completed")
+                        : item.step == currentStep ? String(localized: "in progress")
+                        : String(localized: "not started")
+                )
                 .animation(.spring(duration: 0.3), value: currentStep)
             }
         }

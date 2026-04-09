@@ -9,6 +9,7 @@ struct StatusBadge: View {
             Circle()
                 .fill(Color.connectionStatus(status))
                 .frame(width: 8, height: 8)
+                .accessibilityHidden(true)
 
             Text(status.displayText)
                 .font(.caption)

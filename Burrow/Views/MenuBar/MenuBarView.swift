@@ -54,6 +54,8 @@ struct MenuBarView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
             .padding(12)
 
             // Disconnect
@@ -101,11 +103,13 @@ struct MenuBarView: View {
                                         .font(.caption)
                                         .foregroundStyle(Color.ping(ping))
                                         .monospacedDigit()
+                                        .accessibilityLabel(String(localized: "Latency: \(ping) milliseconds"))
                                 }
                                 if isConnectedToCity(entry.city) {
                                     Image(systemName: "checkmark")
                                         .font(.caption)
                                         .foregroundStyle(.accent)
+                                        .accessibilityHidden(true)
                                 }
                             }
                             .padding(.horizontal, 8)

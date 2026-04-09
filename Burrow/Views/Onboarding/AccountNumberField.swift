@@ -8,6 +8,8 @@ struct AccountNumberField: View {
     var body: some View {
         VStack(spacing: 8) {
             TextField(accountViewModel.provider.accountInputPlaceholder, text: $accountViewModel.accountNumber)
+                .accessibilityLabel(String(localized: "Account number"))
+                .accessibilityHint(String(localized: "Login happens automatically when a valid number is entered"))
                 .textFieldStyle(.plain)
                 .font(.system(size: 24, weight: .medium, design: .monospaced))
                 .multilineTextAlignment(.leading)

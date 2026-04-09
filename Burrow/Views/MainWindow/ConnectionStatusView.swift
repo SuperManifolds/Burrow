@@ -25,6 +25,9 @@ struct ConnectionStatusView: View {
                     withAnimation(.spring(duration: 0.4, bounce: 0.3).delay(0.2)) {
                         iconScale = 1.0
                     }
+                    AccessibilityNotification.Announcement(
+                        connectionViewModel.status.displayText
+                    ).post()
                 }
 
             ConnectionStatusText(

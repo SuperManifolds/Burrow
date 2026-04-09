@@ -34,6 +34,7 @@ struct ConnectionStatusText: View {
                 HStack(spacing: 5) {
                     Image(systemName: "clock")
                         .font(.caption2)
+                        .accessibilityHidden(true)
                     Text(connectionViewModel.formattedDuration)
                         .font(.caption)
                         .fontWeight(.medium)

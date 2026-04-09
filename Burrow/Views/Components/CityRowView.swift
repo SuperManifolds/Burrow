@@ -38,10 +38,12 @@ struct CityRowView: View {
                     .foregroundStyle(Color.ping(ping))
                     .monospacedDigit()
                     .transition(.scale.combined(with: .opacity))
+                    .accessibilityLabel(String(localized: "Latency: \(ping) milliseconds"))
             } else {
                 ProgressView()
                     .controlSize(.small)
                     .transition(.opacity)
+                    .accessibilityLabel(String(localized: "Measuring latency"))
             }
         }
         .padding(.leading, onToggleFavourite != nil ? 8 : 26)

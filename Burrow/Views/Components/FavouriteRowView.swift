@@ -31,6 +31,7 @@ struct FavouriteRowView: View {
                     .font(.caption)
                     .foregroundStyle(Color.ping(ping))
                     .monospacedDigit()
+                    .accessibilityLabel(String(localized: "Latency: \(ping) milliseconds"))
             }
         }
     }
