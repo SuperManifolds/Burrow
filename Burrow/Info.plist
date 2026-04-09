@@ -4,6 +4,8 @@
 <dict>
 	<key>SUFeedURL</key>
 	<string>https://supermanifolds.github.io/Burrow/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>q9XOrE795d/z8YmH7+FvAreIoprXFBB1UvJvoN6Uzic=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUScheduledCheckInterval</key>
