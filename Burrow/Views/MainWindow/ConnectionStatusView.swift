@@ -74,52 +74,18 @@ struct ConnectionStatusView: View {
                 }
             }
 
-            // Switch server info (when connected but a different server is selected)
             if hasDifferentServerSelected {
-                VStack(spacing: 4) {
-                    Text(String(localized: "Switch to"))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .textCase(.uppercase)
-                    if let locationText = selectedLocationText {
-                        Text(locationText)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                    }
-                    if let relay = serverListViewModel.selectedRelay {
-                        Text(relay.hostname)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            // Action buttons
-            if hasDifferentServerSelected {
-                Button {
-                    guard let relay = serverListViewModel.selectedRelay else {
-                        print("[Burrow Switch] No selected relay")
-                        return
-                    }
-                    print("[Burrow Switch] Switching to \(relay.hostname)")
+                SwitchServerView(
+                    locationText: selectedLocationText,
+                    hostname: serverListViewModel.selectedRelay?.hostname
+                ) {
+                    guard let relay = serverListViewModel.selectedRelay else { return }
                     Task {
-                        print("[Burrow Switch] Disconnecting...")
                         await connectionViewModel.disconnect()
-                        print("[Burrow Switch] Disconnected, status: \(connectionViewModel.status)")
                         try? await Task.sleep(for: .milliseconds(500))
-                        print("[Burrow Switch] Connecting to \(relay.hostname)...")
                         await connectionViewModel.connect(to: relay)
-                        print("[Burrow Switch] Connect returned, status: \(connectionViewModel.status)")
                     }
-                } label: {
-                    Text(String(localized: "Switch"))
-                        .frame(minWidth: 140)
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .hoverScale()
-                .transition(.scale.combined(with: .opacity))
             }
 
             Button {
