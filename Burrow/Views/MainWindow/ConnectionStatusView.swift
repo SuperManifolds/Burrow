@@ -76,7 +76,7 @@ struct ConnectionStatusView: View {
 
             if hasDifferentServerSelected {
                 SwitchServerView(
-                    locationText: selectedLocationText,
+                    locationText: serverListViewModel.selectedRelay.flatMap { locationText(for: $0) },
                     hostname: serverListViewModel.selectedRelay?.hostname
                 ) {
                     guard let relay = serverListViewModel.selectedRelay else { return }
@@ -102,31 +102,11 @@ struct ConnectionStatusView: View {
                 }
             )
 
-            if let error = connectionViewModel.error {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-            } else if !connectionViewModel.status.isActive
-                        && serverListViewModel.selectedRelay == nil {
-                Text("Select a server from the sidebar")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .transition(.opacity)
-            } else if !connectionViewModel.status.isActive,
-                      let relay = serverListViewModel.selectedRelay {
-                VStack(spacing: 2) {
-                    if let locationText = selectedLocationText {
-                        Text(locationText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Text(relay.hostname)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+            if !connectionViewModel.status.isActive {
+                ConnectionHint(
+                    connectionViewModel: connectionViewModel,
+                    serverListViewModel: serverListViewModel
+                )
             }
 
             Spacer()
@@ -147,8 +127,6 @@ struct ConnectionStatusView: View {
         .animation(.spring(duration: 0.5, bounce: 0.2), value: connectionViewModel.status)
         .animation(.spring(duration: 0.4, bounce: 0.15), value: serverListViewModel.selectedRelay?.hostname)
     }
-
-    // MARK: - Connection Details Bar
 
     // MARK: - Helpers
 
@@ -182,12 +160,6 @@ struct ConnectionStatusView: View {
     /// Resolve connected relay's location.
     private var connectedLocationText: String? {
         guard let relay = connectionViewModel.connectedRelay else { return nil }
-        return locationText(for: relay)
-    }
-
-    /// Resolve selected relay's location (when disconnected).
-    private var selectedLocationText: String? {
-        guard let relay = serverListViewModel.selectedRelay else { return nil }
         return locationText(for: relay)
     }
 
