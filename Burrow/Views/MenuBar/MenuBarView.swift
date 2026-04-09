@@ -25,100 +25,144 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            statusHeader
-                .padding(12)
+            // Status header
+            HStack(spacing: 10) {
+                Image(systemName: statusIcon)
+                    .font(.title2)
+                    .foregroundStyle(Color.connectionStatus(connectionViewModel.status))
+                    .contentTransition(.symbolEffect(.replace))
 
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(connectionViewModel.status.displayText)
+                        .font(.headline)
+
+                    if case .connected = connectionViewModel.status {
+                        if let locationText = connectedLocationText {
+                            Text(locationText)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+
+                Spacer()
+
+                if case .connected = connectionViewModel.status {
+                    Text(connectionViewModel.formattedDuration)
+                        .font(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(12)
+
+            // Disconnect
             if connectionViewModel.status.isActive {
                 Divider()
-                disconnectButton
-                    .padding(.vertical, 4)
+                Button {
+                    Task { await connectionViewModel.disconnect() }
+                } label: {
+                    HStack {
+                        Image(systemName: "xmark.circle")
+                        Text(String(localized: "Disconnect"))
+                        Spacer()
+                    }
                     .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(MenuBarButtonStyle())
+                .padding(.vertical, 4)
+                .padding(.horizontal, 8)
             }
 
+            // Favourites
             if !serverListViewModel.favouriteCities.isEmpty {
                 Divider()
-                favouritesSection
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 8)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Favourites")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 2)
+
+                    ForEach(serverListViewModel.favouriteCities, id: \.favouriteID) { entry in
+                        Button {
+                            connectToCity(entry.city)
+                        } label: {
+                            HStack(spacing: 8) {
+                                Text(entry.countryCode.countryFlag)
+                                Text(entry.city.cityName)
+                                    .font(.body)
+                                Spacer()
+                                if let ping = serverListViewModel.pings[entry.city.id] {
+                                    Text("\(ping) ms")
+                                        .font(.caption)
+                                        .foregroundStyle(Color.ping(ping))
+                                        .monospacedDigit()
+                                }
+                                if isConnectedToCity(entry.city) {
+                                    Image(systemName: "checkmark")
+                                        .font(.caption)
+                                        .foregroundStyle(.accent)
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(MenuBarButtonStyle())
+                    }
+                }
+                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
             }
 
             Divider()
-            actionsSection
-                .padding(.vertical, 6)
-                .padding(.horizontal, 8)
-        }
-        .frame(width: 280)
-        .task {
-            if serverListViewModel.countries.isEmpty {
-                await serverListViewModel.loadRelays()
-            }
-        }
-    }
 
-    // MARK: - Status Header
-
-    private var statusHeader: some View {
-        HStack(spacing: 10) {
-            Image(systemName: statusIcon)
-                .font(.title2)
-                .foregroundStyle(Color.connectionStatus(connectionViewModel.status))
-                .contentTransition(.symbolEffect(.replace))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(connectionViewModel.status.displayText)
-                    .font(.headline)
-
-                if case .connected = connectionViewModel.status {
-                    if let locationText = connectedLocationText {
-                        Text(locationText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-
-            Spacer()
-
-            if case .connected = connectionViewModel.status {
-                Text(connectionViewModel.formattedDuration)
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    // MARK: - Favourites
-
-    private var favouritesSection: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Favourites")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 2)
-
-            ForEach(serverListViewModel.favouriteCities, id: \.favouriteID) { entry in
+            // Actions
+            VStack(spacing: 2) {
                 Button {
-                    connectToCity(entry.city)
+                    openWindow(id: "main")
+                    NSApplication.shared.activate()
                 } label: {
-                    HStack(spacing: 8) {
-                        Text(entry.countryCode.countryFlag)
-                        Text(entry.city.cityName)
-                            .font(.body)
+                    HStack {
+                        Image(systemName: "macwindow")
+                        Text(String(localized: "Open Burrow"))
                         Spacer()
-                        if let ping = serverListViewModel.pings[entry.city.id] {
-                            Text("\(ping) ms")
-                                .font(.caption)
-                                .foregroundStyle(Color.ping(ping))
-                                .monospacedDigit()
-                        }
-                        if isConnectedToCity(entry.city) {
-                            Image(systemName: "checkmark")
-                                .font(.caption)
-                                .foregroundStyle(.accent)
-                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(MenuBarButtonStyle())
+
+                SettingsLink {
+                    HStack {
+                        Image(systemName: "gear")
+                        Text(String(localized: "Settings…"))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(MenuBarButtonStyle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    NSApplication.shared.activate()
+                })
+
+                Divider()
+                    .padding(.vertical, 4)
+
+                Button {
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    HStack {
+                        Image(systemName: "power")
+                        Text(String(localized: "Quit Burrow"))
+                        Spacer()
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 5)
@@ -126,75 +170,14 @@ struct MenuBarView: View {
                 }
                 .buttonStyle(MenuBarButtonStyle())
             }
-        }
-    }
-
-    // MARK: - Actions
-
-    private var disconnectButton: some View {
-        Button {
-            Task { await connectionViewModel.disconnect() }
-        } label: {
-            HStack {
-                Image(systemName: "xmark.circle")
-                Text(String(localized: "Disconnect"))
-                Spacer()
-            }
+            .padding(.vertical, 6)
             .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(MenuBarButtonStyle())
-    }
-
-    private var actionsSection: some View {
-        VStack(spacing: 2) {
-            Button {
-                openWindow(id: "main")
-                NSApplication.shared.activate()
-            } label: {
-                HStack {
-                    Image(systemName: "macwindow")
-                    Text(String(localized: "Open Burrow"))
-                    Spacer()
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .contentShape(Rectangle())
+        .frame(width: 280)
+        .task {
+            if serverListViewModel.countries.isEmpty {
+                await serverListViewModel.loadRelays()
             }
-            .buttonStyle(MenuBarButtonStyle())
-
-            SettingsLink {
-                HStack {
-                    Image(systemName: "gear")
-                    Text(String(localized: "Settings…"))
-                    Spacer()
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(MenuBarButtonStyle())
-            .simultaneousGesture(TapGesture().onEnded {
-                NSApplication.shared.activate()
-            })
-
-            Divider()
-                .padding(.vertical, 4)
-
-            Button {
-                NSApplication.shared.terminate(nil)
-            } label: {
-                HStack {
-                    Image(systemName: "power")
-                    Text(String(localized: "Quit Burrow"))
-                    Spacer()
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 5)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(MenuBarButtonStyle())
         }
     }
 
