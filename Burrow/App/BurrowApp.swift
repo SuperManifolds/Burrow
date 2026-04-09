@@ -73,38 +73,6 @@ struct BurrowApp: App {
     }
 }
 
-/// Holds a lazily-created ConnectionViewModel so it can be a @StateObject.
-@MainActor
-final class ConnectionViewModelStore: ObservableObject {
-    private var viewModel: ConnectionViewModel?
-
-    func resolve(
-        tunnelManager: any TunnelManaging,
-        accountViewModel: AccountViewModel
-    ) -> ConnectionViewModel {
-        if let existing = viewModel { return existing }
-        let vm = ConnectionViewModel(
-            tunnelManager: tunnelManager,
-            accountViewModel: accountViewModel
-        )
-        viewModel = vm
-        return vm
-    }
-}
-
-/// Holds a lazily-created SettingsViewModel so it can be a @StateObject.
-@MainActor
-final class SettingsViewModelStore: ObservableObject {
-    private var viewModel: SettingsViewModel?
-
-    func resolve(accountViewModel: AccountViewModel) -> SettingsViewModel {
-        if let existing = viewModel { return existing }
-        let vm = SettingsViewModel(accountViewModel: accountViewModel)
-        viewModel = vm
-        return vm
-    }
-}
-
 #if DEBUG
 #Preview("Main Window") {
     let accountVM = AccountViewModel.preview(loggedIn: true)
