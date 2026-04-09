@@ -49,25 +49,6 @@ protocol TunnelManaging: AnyObject {
     nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)?
 }
 
-// MARK: - Default Parameters
-
-extension TunnelManaging {
-    /// Convenience connect with default port, DNS, and MTU.
-    func connect(
-        to relay: Relay,
-        with device: Device,
-        privateKey: Data
-    ) async throws {
-        try await connect(
-            to: relay,
-            with: device,
-            privateKey: privateKey,
-            port: 51820,
-            dns: "10.64.0.1",
-            mtu: 1280
-        )
-    }
-}
 
 // MARK: - Mock for Previews and Tests
 
