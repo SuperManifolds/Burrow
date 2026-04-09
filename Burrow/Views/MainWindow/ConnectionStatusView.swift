@@ -5,7 +5,6 @@ struct ConnectionStatusView: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
     @State private var iconScale: CGFloat = 1.0
-    @State private var copiedIP: Bool = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -178,8 +177,13 @@ struct ConnectionStatusView: View {
 
             // Connection details bar (only when connected)
             if case .connected = connectionViewModel.status {
-                connectionDetailsBar
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                ConnectionDetailsBar(
+                    ipAddress: connectionViewModel.connectedRelay?.ipv4AddrIn,
+                    ping: connectedPing,
+                    transferTx: connectionViewModel.transferTx,
+                    transferRx: connectionViewModel.transferRx
+                )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .frame(maxWidth: .infinity)
@@ -189,99 +193,6 @@ struct ConnectionStatusView: View {
     }
 
     // MARK: - Connection Details Bar
-
-    @ViewBuilder
-    private var connectionDetailsBar: some View {
-        HStack(spacing: 10) {
-            ConnectionDetailCard(label: String(localized: "IP Address")) {
-                HStack(spacing: 6) {
-                    Text(connectionViewModel.connectedRelay?.ipv4AddrIn ?? "—")
-                        .font(.callout)
-                        .fontWeight(.semibold)
-                        .monospacedDigit()
-                    Image(systemName: copiedIP ? "checkmark" : "doc.on.doc")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .contentTransition(.symbolEffect(.replace))
-                }
-            }
-            .onTapGesture {
-                if let ip = connectionViewModel.connectedRelay?.ipv4AddrIn {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(ip, forType: .string)
-                    copiedIP = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        copiedIP = false
-                    }
-                }
-            }
-            .overlay(alignment: .top) {
-                if copiedIP {
-                    Text("Copied!")
-                        .font(.caption2)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.accent, in: RoundedRectangle(cornerRadius: 4))
-                        .foregroundStyle(.white)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .offset(y: -24)
-                }
-            }
-            .animation(.spring(duration: 0.3), value: copiedIP)
-            .onHover { hovering in
-                if hovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pop()
-                }
-            }
-
-            ConnectionDetailCard(label: String(localized: "Protocol")) {
-                Text("WireGuard")
-                    .font(.callout)
-                    .fontWeight(.semibold)
-            }
-
-            ConnectionDetailCard(label: String(localized: "Latency")) {
-                if let ping = connectedPing {
-                    HStack(spacing: 4) {
-                        Text("\(ping) ms")
-                            .font(.callout)
-                            .fontWeight(.semibold)
-                            .monospacedDigit()
-                        Text(latencyLabel(ping))
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .fixedSize()
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.ping(ping).opacity(0.2))
-                            .foregroundStyle(Color.ping(ping))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                    }
-                } else {
-                    Text("—")
-                        .font(.callout)
-                        .fontWeight(.semibold)
-                }
-            }
-
-            ConnectionDetailCard(label: String(localized: "Transfer")) {
-                HStack(spacing: 8) {
-                    Text("↑ \(ConnectionViewModel.formattedBytes(connectionViewModel.transferTx))")
-                        .font(.callout)
-                        .fontWeight(.medium)
-                        .foregroundStyle(Color(.systemGreen))
-                    Text("↓ \(ConnectionViewModel.formattedBytes(connectionViewModel.transferRx))")
-                        .font(.callout)
-                        .fontWeight(.medium)
-                        .foregroundStyle(Color(.systemBlue))
-                }
-            }
-        }
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal)
-    }
 
     // MARK: - Helpers
 
@@ -331,16 +242,6 @@ struct ConnectionStatusView: View {
         return serverListViewModel.pings[info.cityId]
     }
 
-    private func latencyLabel(_ ms: Int) -> String {
-        switch ms {
-            case ..<50: String(localized: "Excellent")
-            case ..<100: String(localized: "Great")
-            case ..<150: String(localized: "Good")
-            case ..<200: String(localized: "Fair")
-            case ..<300: String(localized: "Slow")
-            default: String(localized: "Poor")
-        }
-    }
 }
 
 #if DEBUG
