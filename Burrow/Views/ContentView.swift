@@ -10,42 +10,35 @@ struct ContentView: View {
     var body: some View {
         Group {
             if accountViewModel.isLoggedIn {
-                mainInterface
+                NavigationSplitView {
+                    ServerListView(
+                        serverListViewModel: serverListViewModel,
+                        connectionViewModel: connectionViewModel
+                    )
+                    .navigationSplitViewColumnWidth(min: 220, ideal: 260)
+                } detail: {
+                    ConnectionStatusView(
+                        connectionViewModel: connectionViewModel,
+                        serverListViewModel: serverListViewModel
+                    )
+                }
+                .onAppear {
+                    connectionViewModel.settingsViewModel = settingsViewModel
+                }
+                .task {
+                    if settingsViewModel.autoConnect,
+                       !connectionViewModel.status.isActive,
+                       serverListViewModel.selectedRelay == nil {
+                        while serverListViewModel.countries.isEmpty {
+                            try? await Task.sleep(for: .milliseconds(100))
+                        }
+                        if let relay = serverListViewModel.selectedRelay {
+                            await connectionViewModel.connect(to: relay)
+                        }
+                    }
+                }
             } else {
                 LoginView(accountViewModel: accountViewModel)
-            }
-        }
-    }
-
-    // MARK: - Main Interface
-
-    private var mainInterface: some View {
-        NavigationSplitView {
-            ServerListView(
-                serverListViewModel: serverListViewModel,
-                connectionViewModel: connectionViewModel
-            )
-            .navigationSplitViewColumnWidth(min: 220, ideal: 260)
-        } detail: {
-            ConnectionStatusView(
-                connectionViewModel: connectionViewModel,
-                serverListViewModel: serverListViewModel
-            )
-        }
-        .onAppear {
-            connectionViewModel.settingsViewModel = settingsViewModel
-        }
-        .task {
-            if settingsViewModel.autoConnect,
-               !connectionViewModel.status.isActive,
-               serverListViewModel.selectedRelay == nil {
-                // Wait for relays to load so selectedRelay can be restored
-                while serverListViewModel.countries.isEmpty {
-                    try? await Task.sleep(for: .milliseconds(100))
-                }
-                if let relay = serverListViewModel.selectedRelay {
-                    await connectionViewModel.connect(to: relay)
-                }
             }
         }
     }
