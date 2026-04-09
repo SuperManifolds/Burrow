@@ -212,6 +212,7 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -x
           SPARKLE_VERSION="2.9.1"
           mkdir -p /tmp/sparkle
           gh release download "$SPARKLE_VERSION" \
@@ -219,9 +220,14 @@ jobs:
             --pattern "Sparkle-${SPARKLE_VERSION}.tar.xz" \
             --dir /tmp
           tar xJf /tmp/Sparkle-${SPARKLE_VERSION}.tar.xz -C /tmp/sparkle
-          SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update $RUNNER_TEMP/Burrow.dmg)
-          echo "SPARKLE_ED_SIG=$(echo "$SIG_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
-          echo "DMG_LENGTH=$(echo "$SIG_OUTPUT" | sed -n 's/.*length="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
+          ls -la /tmp/sparkle/bin/
+          echo "Signing DMG..."
+          SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update "$RUNNER_TEMP/Burrow.dmg" 2>&1)
+          echo "sign_update output: $SIG_OUTPUT"
+          SPARKLE_ED_SIG=$(echo "$SIG_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')
+          DMG_LENGTH=$(echo "$SIG_OUTPUT" | sed -n 's/.*length="\([^"]*\)".*/\1/p')
+          echo "SPARKLE_ED_SIG=$SPARKLE_ED_SIG" >> $GITHUB_ENV
+          echo "DMG_LENGTH=$DMG_LENGTH" >> $GITHUB_ENV
 
       # ── Release ──────────────────────────────────────────────────
 
