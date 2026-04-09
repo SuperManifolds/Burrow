@@ -212,8 +212,12 @@ jobs:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
           SPARKLE_VERSION="2.9.1"
-          curl -sL "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz" \
-            | tar xJ -C /tmp/sparkle
+          mkdir -p /tmp/sparkle
+          gh release download "$SPARKLE_VERSION" \
+            --repo sparkle-project/Sparkle \
+            --pattern "Sparkle-${SPARKLE_VERSION}.tar.xz" \
+            --dir /tmp
+          tar xJf /tmp/Sparkle-${SPARKLE_VERSION}.tar.xz -C /tmp/sparkle
           SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update $RUNNER_TEMP/Burrow.dmg)
           echo "SPARKLE_ED_SIG=$(echo "$SIG_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
           echo "DMG_LENGTH=$(echo "$SIG_OUTPUT" | sed -n 's/.*length="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
