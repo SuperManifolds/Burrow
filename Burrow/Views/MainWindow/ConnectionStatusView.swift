@@ -27,52 +27,10 @@ struct ConnectionStatusView: View {
                     }
                 }
 
-            // Status text
-            VStack(spacing: 6) {
-                Text(connectionViewModel.status.displayText)
-                    .font(.title2)
-                    .fontWeight(.semibold)
-
-                if case .connected = connectionViewModel.status {
-                    if let locationText = connectedLocationText {
-                        Text(locationText)
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-
-                    if let relay = connectionViewModel.connectedRelay {
-                        HStack(spacing: 4) {
-                            Text(relay.hostname)
-                            Text("·")
-                            Text("WireGuard")
-                                .foregroundStyle(.accent)
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-
-                    // Duration badge
-                    HStack(spacing: 5) {
-                        Image(systemName: "clock")
-                            .font(.caption2)
-                        Text(connectionViewModel.formattedDuration)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .monospacedDigit()
-                    }
-                    .foregroundStyle(.accent.opacity(0.8))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(.accent.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .transition(.scale.combined(with: .opacity))
-                    .accessibilityLabel(
-                        String(localized: "Connected for \(connectionViewModel.formattedDuration)")
-                    )
-                }
-            }
+            ConnectionStatusText(
+                connectionViewModel: connectionViewModel,
+                serverListViewModel: serverListViewModel
+            )
 
             if hasDifferentServerSelected {
                 SwitchServerView(
@@ -155,12 +113,6 @@ struct ConnectionStatusView: View {
         guard let info = serverListViewModel.relayIndex[relay.hostname] else { return nil }
         let flag = info.countryCode.countryFlag
         return "\(flag) \(info.countryName) · \(info.cityName)"
-    }
-
-    /// Resolve connected relay's location.
-    private var connectedLocationText: String? {
-        guard let relay = connectionViewModel.connectedRelay else { return nil }
-        return locationText(for: relay)
     }
 
     /// Look up ping for the city containing the connected relay.
