@@ -119,20 +119,32 @@ jobs:
 
           xattr -cr "$APP_PATH"
 
-          # Sign inside-out: Network Extension first
-          codesign --force --options runtime --timestamp \
-            --sign "Developer ID Application" \
-            --entitlements BurrowTunnel/BurrowTunnel.release.entitlements \
-            "$APP_PATH/Contents/PlugIns/BurrowTunnel.appex"
+          # Sign inside-out: deepest nested binaries first
 
-          # Sign any embedded frameworks
+          # Sign all executables, dylibs, and apps inside frameworks
           if [ -d "$APP_PATH/Contents/Frameworks" ]; then
             find "$APP_PATH/Contents/Frameworks" \
-              \( -name "*.framework" -o -name "*.dylib" \) | while read f; do
+              \( -name "*.app" -o -name "*.dylib" -o -name "*.xpc" -o -type f -perm +111 \) \
+              -not -path "*/Headers/*" -not -path "*/Modules/*" -not -name "*.h" \
+              | sort -r | while read f; do
+              # Skip non-Mach-O files
+              file "$f" | grep -q "Mach-O" || continue
+              codesign --force --options runtime --timestamp \
+                --sign "Developer ID Application" "$f"
+            done
+
+            # Then sign the frameworks themselves
+            find "$APP_PATH/Contents/Frameworks" -name "*.framework" -maxdepth 1 | while read f; do
               codesign --force --options runtime --timestamp \
                 --sign "Developer ID Application" "$f"
             done
           fi
+
+          # Sign the Network Extension
+          codesign --force --options runtime --timestamp \
+            --sign "Developer ID Application" \
+            --entitlements BurrowTunnel/BurrowTunnel.release.entitlements \
+            "$APP_PATH/Contents/PlugIns/BurrowTunnel.appex"
 
           # Sign the main app last
           codesign --force --options runtime --timestamp \
