@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+  <channel>
+    <title>Burrow Updates</title>
+    <link>https://supermanifolds.github.io/Burrow/appcast.xml</link>
+    <description>Most recent updates for Burrow</description>
+    <language>en</language>
+    <item>
+      <title>Version 0.1.0</title>
+      <pubDate>Thu, 09 Apr 2026 11:14:57 +0000</pubDate>
+      <sparkle:version>1</sparkle:version>
+      <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description>&lt;style&gt;
+body { font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.5; color: #333; }
+h2 { font-size: 15px; margin: 16px 0 8px; }
+h3 { font-size: 14px; margin: 12px 0 6px; }
+ul { padding-left: 20px; margin: 4px 0; }
+li { margin: 2px 0; }
+code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+a { color: #0066cc; text-decoration: none; }
+&lt;/style&gt;
+&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/SuperManifolds/Burrow/commits/v0.1.0&lt;/p&gt;</description>
+      <enclosure url="https://github.com/SuperManifolds/Burrow/releases/download/v0.1.0/Burrow.dmg" length="8662598" type="application/octet-stream" sparkle:edSignature="vFoK5ks0JIlUdmTHw2xbW+Lvlv75ZXZL19fSuk3uhoFI43C43R6Nr9F1Uguhysp+DuIf9ZfbTCLjvSInmY0XCw==" />
+    </item>
+  </channel>
+</rss>
