@@ -1,26 +1,22 @@
-# Burrow
+<p align="center">
+  <img src="burrow-icon-dark.png" width="128" height="128" alt="Burrow icon">
+</p>
 
-A lightweight, native macOS WireGuard VPN client for [Mullvad VPN](https://mullvad.net). Built with SwiftUI.
+<h1 align="center">Burrow</h1>
+
+<p align="center">
+  A lightweight, native macOS WireGuard VPN client for <a href="https://mullvad.net">Mullvad VPN</a>. Built with SwiftUI.
+</p>
 
 ![Burrow connected to Oslo](burrow.png)
 
-## Features
+## Install
 
-- **One-click connect** — Select a server, click connect. That's it.
-- **Menu bar integration** — Lives in your menu bar with a status icon. No dock clutter.
-- **Favourites** — Star your preferred servers for quick access.
-- **Server browser** — Browse all Mullvad relay servers grouped by country, with live latency measurements.
-- **Connection details** — See your IP address, protocol, latency, and transfer stats at a glance.
-- **Switch servers** — Seamlessly switch between servers while connected.
-- **Auto-connect** — Optionally connect to your last server on launch.
-- **Launch at login** — Start Burrow automatically when you log in.
-- **Configurable MTU** — Tune your tunnel's MTU for your network.
-- **Device management** — View and remove registered devices from Settings.
-- **Subscription status** — See your Mullvad subscription expiry in Settings.
+Download the latest DMG from [Releases](https://github.com/SuperManifolds/Burrow/releases), open it, and drag Burrow to your Applications folder.
 
 ## Requirements
 
-- macOS 26.4 or later
+- macOS 26.4 or later (Apple Silicon)
 - A [Mullvad VPN](https://mullvad.net) account
 
 ## Building
