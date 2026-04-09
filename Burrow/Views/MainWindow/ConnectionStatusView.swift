@@ -88,28 +88,18 @@ struct ConnectionStatusView: View {
                 }
             }
 
-            Button {
-                Task {
-                    if connectionViewModel.status.isActive {
-                        await connectionViewModel.disconnect()
-                    } else if let relay = serverListViewModel.selectedRelay {
-                        await connectionViewModel.connect(to: relay)
+            ConnectButton(
+                isActive: connectionViewModel.status.isActive,
+                isDisabled: !connectionViewModel.status.isActive
+                    && serverListViewModel.selectedRelay == nil,
+                onConnect: {
+                    if let relay = serverListViewModel.selectedRelay {
+                        Task { await connectionViewModel.connect(to: relay) }
                     }
+                },
+                onDisconnect: {
+                    Task { await connectionViewModel.disconnect() }
                 }
-            } label: {
-                let label = connectionViewModel.status.isActive
-                    ? String(localized: "Disconnect")
-                    : String(localized: "Connect")
-                Text(label)
-                    .frame(minWidth: 140)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(connectionViewModel.status.isActive ? .red : .accentColor)
-            .controlSize(.large)
-            .hoverScale()
-            .disabled(
-                !connectionViewModel.status.isActive
-                    && serverListViewModel.selectedRelay == nil
             )
 
             if let error = connectionViewModel.error {
