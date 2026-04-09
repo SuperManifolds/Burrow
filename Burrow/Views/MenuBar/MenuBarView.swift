@@ -21,6 +21,7 @@ struct MenuBarView: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
     @ObservedObject var accountViewModel: AccountViewModel
+    @ObservedObject var updaterViewModel: UpdaterViewModel
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -157,6 +158,21 @@ struct MenuBarView: View {
                     NSApplication.shared.activate()
                 })
 
+                Button {
+                    NSApplication.shared.activate()
+                    updaterViewModel.checkForUpdates()
+                } label: {
+                    HStack {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                        Text(String(localized: "Check for Updates…"))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(MenuBarButtonStyle())
+
                 Divider()
                     .padding(.vertical, 4)
 
@@ -226,7 +242,8 @@ struct MenuBarView: View {
             accountViewModel: AccountViewModel()
         ),
         serverListViewModel: ServerListViewModel.preview(),
-        accountViewModel: AccountViewModel()
+        accountViewModel: AccountViewModel(),
+        updaterViewModel: UpdaterViewModel()
     )
 }
 #endif

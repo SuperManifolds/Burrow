@@ -183,6 +183,21 @@ jobs:
 
       # ── Release ──────────────────────────────────────────────────
 
+      # ── Sparkle Signing ─────────────────────────────────────────
+
+      - name: Sign DMG with Sparkle EdDSA
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          SPARKLE_VERSION="2.7.5"
+          curl -sL "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz" \
+            | tar xJ -C /tmp/sparkle
+          SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update $RUNNER_TEMP/Burrow.dmg)
+          echo "SPARKLE_ED_SIG=$(echo "$SIG_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
+          echo "DMG_LENGTH=$(echo "$SIG_OUTPUT" | sed -n 's/.*length="\([^"]*\)".*/\1/p')" >> $GITHUB_ENV
+
+      # ── Release ──────────────────────────────────────────────────
+
       - name: Extract version from tag
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
@@ -196,6 +211,51 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Appcast ──────────────────────────────────────────────────
+
+      - name: Fetch release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ github.ref_name }}" --json body -q .body > $RUNNER_TEMP/release_notes.md 2>/dev/null || echo "" > $RUNNER_TEMP/release_notes.md
+
+      - name: Update appcast
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          BUILD_NUMBER=$(grep -A1 'CURRENT_PROJECT_VERSION' Burrow.xcodeproj/project.pbxproj | grep -o '[0-9]*' | head -1)
+
+          # Fetch existing appcast from gh-pages
+          mkdir -p appcast-output
+          git fetch origin gh-pages 2>/dev/null || true
+          git show origin/gh-pages:appcast.xml > appcast-output/appcast.xml 2>/dev/null || cat > appcast-output/appcast.xml << 'SKELETON'
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+            <channel>
+              <title>Burrow Updates</title>
+              <link>https://supermanifolds.github.io/Burrow/appcast.xml</link>
+              <description>Most recent updates for Burrow</description>
+              <language>en</language>
+            </channel>
+          </rss>
+          SKELETON
+
+          python3 scripts/update_appcast.py \
+            --version "$VERSION" \
+            --build "${BUILD_NUMBER:-1}" \
+            --signature "$SPARKLE_ED_SIG" \
+            --length "$DMG_LENGTH" \
+            --url "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/Burrow.dmg" \
+            --notes "$(cat $RUNNER_TEMP/release_notes.md)" \
+            --appcast appcast-output/appcast.xml
+
+      - name: Deploy appcast to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./appcast-output
+          publish_branch: gh-pages
+          keep_files: true
 
       # ── Cleanup ──────────────────────────────────────────────────
 

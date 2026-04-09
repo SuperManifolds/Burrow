@@ -15,6 +15,7 @@
 		FA88BD752F85800E00690D80 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA88BD742F85800E00690D80 /* NetworkExtension.framework */; };
 		FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA88BD832F85805D00690D80 /* WireGuardKit */; };
+		FA9F77D92F87B3F0004B3228 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FA9F77D82F87B3F0004B3228 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		FA66DAB42F868759002127EF /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		FA88BD722F85800E00690D80 /* BurrowTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BurrowTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA88BD742F85800E00690D80 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		FABC97752F86FE6C00DF6425 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -108,6 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA9F77D92F87B3F0004B3228 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +161,7 @@
 				FA66DAB12F868563002127EF /* AGENTS.md */,
 				FA66DAB32F868648002127EF /* CONTRIBUTING.md */,
 				FA66DAB42F868759002127EF /* LICENSE */,
+				FABC97752F86FE6C00DF6425 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -203,6 +207,7 @@
 			);
 			name = Burrow;
 			packageProductDependencies = (
+				FA9F77D82F87B3F0004B3228 /* Sparkle */,
 			);
 			productName = Burrow;
 			productReference = FA1E6B392F8572E500F6F863 /* Burrow.app */;
@@ -317,6 +322,7 @@
 			packageReferences = (
 				FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */,
 				FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				FA9F77D72F87B3F0004B3228 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA1E6B3A2F8572E500F6F863 /* Products */;
@@ -583,6 +589,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Burrow/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -620,6 +627,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Burrow/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -853,6 +861,14 @@
 				kind = branch;
 			};
 		};
+		FA9F77D72F87B3F0004B3228 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -870,6 +886,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */;
 			productName = WireGuardKit;
+		};
+		FA9F77D82F87B3F0004B3228 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA9F77D72F87B3F0004B3228 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

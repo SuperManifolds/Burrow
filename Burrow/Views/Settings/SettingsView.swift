@@ -4,11 +4,15 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settingsViewModel: SettingsViewModel
     @ObservedObject var accountViewModel: AccountViewModel
+    @ObservedObject var updaterViewModel: UpdaterViewModel
 
     var body: some View {
         TabView {
             Tab("General", systemImage: "gear") {
-                GeneralSettingsTab(settingsViewModel: settingsViewModel)
+                GeneralSettingsTab(
+                    settingsViewModel: settingsViewModel,
+                    updaterViewModel: updaterViewModel
+                )
             }
 
             Tab("VPN", systemImage: "network") {
@@ -30,11 +34,18 @@ struct SettingsView: View {
 
 private struct GeneralSettingsTab: View {
     @ObservedObject var settingsViewModel: SettingsViewModel
+    @ObservedObject var updaterViewModel: UpdaterViewModel
 
     var body: some View {
         Form {
             Toggle("Launch Burrow at login", isOn: $settingsViewModel.launchAtLogin)
             Toggle("Auto-connect on launch", isOn: $settingsViewModel.autoConnect)
+            Section {
+                Button("Check for Updates…") {
+                    updaterViewModel.checkForUpdates()
+                }
+                .disabled(!updaterViewModel.canCheckForUpdates)
+            }
         }
         .formStyle(.grouped)
     }
@@ -155,7 +166,8 @@ private struct DevicesSettingsTab: View {
 
     SettingsView(
         settingsViewModel: SettingsViewModel(accountViewModel: accountVM),
-        accountViewModel: accountVM
+        accountViewModel: accountVM,
+        updaterViewModel: UpdaterViewModel()
     )
 }
 #endif

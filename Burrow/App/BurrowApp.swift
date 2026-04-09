@@ -11,6 +11,7 @@ struct BurrowApp: App {
     @StateObject private var serverListViewModel = ServerListViewModel()
     @StateObject private var connectionStore = ConnectionViewModelStore()
     @StateObject private var settingsStore = SettingsViewModelStore()
+    @StateObject private var updaterViewModel = UpdaterViewModel()
 
     // MARK: - Body
 
@@ -36,7 +37,8 @@ struct BurrowApp: App {
         Settings {
             SettingsView(
                 settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel),
-                accountViewModel: accountViewModel
+                accountViewModel: accountViewModel,
+                updaterViewModel: updaterViewModel
             )
         }
 
@@ -45,7 +47,8 @@ struct BurrowApp: App {
                 MenuBarView(
                     connectionViewModel: connectionViewModel,
                     serverListViewModel: serverListViewModel,
-                    accountViewModel: accountViewModel
+                    accountViewModel: accountViewModel,
+                    updaterViewModel: updaterViewModel
                 )
             }
         } label: {
