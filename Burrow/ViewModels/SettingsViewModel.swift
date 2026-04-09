@@ -65,7 +65,7 @@ final class SettingsViewModel: ObservableObject {
         self.autoConnect = UserDefaults.standard.bool(forKey: "auto_connect")
 
         let savedMTU = UserDefaults.standard.integer(forKey: "mtu_value")
-        self.mtu = savedMTU > 0 ? savedMTU : 1280
+        self.mtu = savedMTU > 0 ? savedMTU : TunnelDefaults.mtu
     }
 
     // MARK: - Public API
@@ -74,9 +74,9 @@ final class SettingsViewModel: ObservableObject {
     var effectiveDNS: String {
         switch dnsOption {
             case .mullvad:
-                return "10.64.0.1"
+                return TunnelDefaults.dns
             case .custom:
-                return customDNS.isEmpty ? "10.64.0.1" : customDNS
+                return customDNS.isEmpty ? TunnelDefaults.dns : customDNS
         }
     }
 
@@ -166,8 +166,8 @@ enum WireGuardPort: Int, CaseIterable, Identifiable {
 
     var portNumber: Int {
         switch self {
-            case .automatic: return 51820
-            case .port51820: return 51820
+            case .automatic: return TunnelDefaults.port
+            case .port51820: return TunnelDefaults.port
             case .port53: return 53
         }
     }

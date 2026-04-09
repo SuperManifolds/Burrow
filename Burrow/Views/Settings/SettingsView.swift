@@ -71,7 +71,7 @@ private struct VPNSettingsTab: View {
             Section("MTU") {
                 TextField("MTU", value: $settingsViewModel.mtu, formatter: NumberFormatter())
                     .textFieldStyle(.roundedBorder)
-                Text("Default: 1280. Valid range: 1280–9000.")
+                Text("Default: \(TunnelDefaults.mtu). Valid range: 1280–9000.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

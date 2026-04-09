@@ -90,9 +90,9 @@ final class TunnelManager: ObservableObject, TunnelManaging {
         to relay: Relay,
         with device: Device,
         privateKey: Data,
-        port: Int = 51820,
-        dns: String = "10.64.0.1",
-        mtu: Int = 1280
+        port: Int = TunnelDefaults.port,
+        dns: String = TunnelDefaults.dns,
+        mtu: Int = TunnelDefaults.mtu
     ) async throws {
         guard let manager = tunnelManager else {
             try await loadTunnelManager()

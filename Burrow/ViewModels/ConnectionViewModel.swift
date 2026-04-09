@@ -56,9 +56,9 @@ final class ConnectionViewModel: ObservableObject {
         }
 
         do {
-            let port = settingsViewModel?.effectivePort ?? 51820
-            let dns = settingsViewModel?.effectiveDNS ?? "10.64.0.1"
-            let mtu = settingsViewModel?.effectiveMTU ?? 1280
+            let port = settingsViewModel?.effectivePort ?? TunnelDefaults.port
+            let dns = settingsViewModel?.effectiveDNS ?? TunnelDefaults.dns
+            let mtu = settingsViewModel?.effectiveMTU ?? TunnelDefaults.mtu
             print("[Burrow] Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port), MTU:\(mtu))")
             try await tunnelManager.connect(
                 to: relay, with: device, privateKey: privateKey,
