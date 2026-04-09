@@ -221,8 +221,10 @@ jobs:
             --dir /tmp
           tar xJf /tmp/Sparkle-${SPARKLE_VERSION}.tar.xz -C /tmp/sparkle
           ls -la /tmp/sparkle/bin/
+          echo "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle_key"
           echo "Signing DMG..."
-          SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update "$RUNNER_TEMP/Burrow.dmg" 2>&1)
+          SIG_OUTPUT=$(/tmp/sparkle/bin/sign_update "$RUNNER_TEMP/Burrow.dmg" --ed-key-file "$RUNNER_TEMP/sparkle_key" 2>&1)
+          rm -f "$RUNNER_TEMP/sparkle_key"
           echo "sign_update output: $SIG_OUTPUT"
           SPARKLE_ED_SIG=$(echo "$SIG_OUTPUT" | sed -n 's/.*sparkle:edSignature="\([^"]*\)".*/\1/p')
           DMG_LENGTH=$(echo "$SIG_OUTPUT" | sed -n 's/.*length="\([^"]*\)".*/\1/p')
