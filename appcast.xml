@@ -23,5 +23,35 @@ a { color: #0066cc; text-decoration: none; }
 &lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/SuperManifolds/Burrow/commits/v0.1.0&lt;/p&gt;</description>
       <enclosure url="https://github.com/SuperManifolds/Burrow/releases/download/v0.1.0/Burrow.dmg" length="8662598" type="application/octet-stream" sparkle:edSignature="vFoK5ks0JIlUdmTHw2xbW+Lvlv75ZXZL19fSuk3uhoFI43C43R6Nr9F1Uguhysp+DuIf9ZfbTCLjvSInmY0XCw==" />
     </item>
+    <item>
+      <title>Version 0.2.0</title>
+      <pubDate>Tue, 28 Apr 2026 16:00:59 +0000</pubDate>
+      <sparkle:version>2</sparkle:version>
+      <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <description>&lt;style&gt;
+body { font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.5; color: #333; }
+h2 { font-size: 15px; margin: 16px 0 8px; }
+h3 { font-size: 14px; margin: 12px 0 6px; }
+ul { padding-left: 20px; margin: 4px 0; }
+li { margin: 2px 0; }
+code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+a { color: #0066cc; text-decoration: none; }
+&lt;/style&gt;
+&lt;h2&gt;New Features&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Menu bar status text&lt;/strong&gt;: Show connected time, server location, or both next to the menu bar icon. Optional colored icon (green/orange) for connection state.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Global keyboard shortcut&lt;/strong&gt;: Configurable hotkey to toggle VPN from anywhere. Falls back to top favourite if no server is selected.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Connection notifications&lt;/strong&gt;: Native macOS notifications on connect, disconnect, unexpected drops, and failures. Actionable Disconnect/Reconnect buttons.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;App Intents&lt;/strong&gt;: Connect VPN, Disconnect VPN, Toggle VPN, and Get VPN Status available in Shortcuts, Siri, and Spotlight. Server picker with fuzzy search.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Fixes&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Sparkle gentle reminders for menu bar app&lt;/li&gt;
+&lt;li&gt;Session expiry in Devices tab now shows "Log Out" instead of broken "Retry"&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/SuperManifolds/Burrow/compare/v0.1.0...v0.2.0&lt;/p&gt;</description>
+      <enclosure url="https://github.com/SuperManifolds/Burrow/releases/download/v0.2.0/Burrow.dmg" length="8765232" type="application/octet-stream" sparkle:edSignature="NeYUPvnT1ZnIc8Ag2FJYIGYSon1X+U5EOAh49Xxbl30r26eZgobr3HZmYdHD7Y4OYYRomIcCAKGFbAX/mEyNAQ==" />
+    </item>
   </channel>
 </rss>
