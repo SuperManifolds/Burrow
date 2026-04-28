@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import KeyboardShortcuts
 import SwiftUI
 
 @main
@@ -89,6 +90,31 @@ private struct MenuBarLabel: View {
             if let statusText {
                 Text(statusText)
                     .monospacedDigit()
+            }
+        }
+        .task {
+            if serverListViewModel.countries.isEmpty {
+                await serverListViewModel.loadRelays()
+            }
+        }
+        .task {
+            for await _ in KeyboardShortcuts.events(.keyUp, for: .toggleConnection) {
+                toggleConnection()
+            }
+        }
+    }
+
+    private func toggleConnection() {
+        guard connectionViewModel.status != .connecting,
+              connectionViewModel.status != .disconnecting else { return }
+
+        Task {
+            if connectionViewModel.status.isActive {
+                await connectionViewModel.disconnect()
+            } else if let relay = serverListViewModel.selectedRelay
+                        ?? serverListViewModel.favouriteCities.first
+                            .flatMap({ serverListViewModel.selectRelay(in: $0.city) }) {
+                await connectionViewModel.connect(to: relay)
             }
         }
     }

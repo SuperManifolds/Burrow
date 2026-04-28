@@ -1,3 +1,4 @@
+import KeyboardShortcuts
 import SwiftUI
 
 /// A button style that highlights on hover, matching native menu bar dropdowns.
@@ -69,6 +70,11 @@ struct MenuBarView: View {
                         Image(systemName: "xmark.circle")
                         Text(String(localized: "Disconnect"))
                         Spacer()
+                        if let shortcut = KeyboardShortcuts.getShortcut(for: .toggleConnection) {
+                            Text(shortcut.description)
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 5)
@@ -194,11 +200,6 @@ struct MenuBarView: View {
             .padding(.horizontal, 8)
         }
         .frame(width: 280)
-        .task {
-            if serverListViewModel.countries.isEmpty {
-                await serverListViewModel.loadRelays()
-            }
-        }
     }
 
     // MARK: - Helpers

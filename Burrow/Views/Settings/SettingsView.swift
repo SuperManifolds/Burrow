@@ -1,3 +1,4 @@
+import KeyboardShortcuts
 import SwiftUI
 
 /// Preferences window with tabbed sections for General, VPN, and Devices.
@@ -40,6 +41,13 @@ private struct GeneralSettingsTab: View {
         Form {
             Toggle("Launch Burrow at login", isOn: $settingsViewModel.launchAtLogin)
             Toggle("Auto-connect on launch", isOn: $settingsViewModel.autoConnect)
+
+            Section("Keyboard Shortcut") {
+                KeyboardShortcuts.Recorder(
+                    String(localized: "Toggle Connection"),
+                    name: .toggleConnection
+                )
+            }
 
             Section("Menu Bar") {
                 Picker("Display", selection: $settingsViewModel.menuBarDisplay) {

@@ -16,6 +16,7 @@
 		FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA88BD832F85805D00690D80 /* WireGuardKit */; };
 		FA9F77D92F87B3F0004B3228 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FA9F77D82F87B3F0004B3228 /* Sparkle */; };
+		FAA1B0012FA0000000000001 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = FAA1B0002FA0000000000001 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +112,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA9F77D92F87B3F0004B3228 /* Sparkle in Frameworks */,
+				FAA1B0012FA0000000000001 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,6 +210,7 @@
 			name = Burrow;
 			packageProductDependencies = (
 				FA9F77D82F87B3F0004B3228 /* Sparkle */,
+				FAA1B0002FA0000000000001 /* KeyboardShortcuts */,
 			);
 			productName = Burrow;
 			productReference = FA1E6B392F8572E500F6F863 /* Burrow.app */;
@@ -323,6 +326,7 @@
 				FA88BD6D2F857FDD00690D80 /* XCRemoteSwiftPackageReference "wireguard-apple" */,
 				FA12DF4B2F86758D00EC7456 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				FA9F77D72F87B3F0004B3228 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				FAA1B0022FA0000000000002 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FA1E6B3A2F8572E500F6F863 /* Products */;
@@ -869,6 +873,14 @@
 				minimumVersion = 2.9.1;
 			};
 		};
+		FAA1B0022FA0000000000002 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -891,6 +903,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FA9F77D72F87B3F0004B3228 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		FAA1B0002FA0000000000001 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FAA1B0022FA0000000000002 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
