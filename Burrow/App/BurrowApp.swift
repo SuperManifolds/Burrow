@@ -10,7 +10,7 @@ struct BurrowApp: App {
     // MARK: - State
 
     @StateObject private var accountViewModel = AccountViewModel()
-    @StateObject private var tunnelManager = TunnelManager()
+    @StateObject private var tunnelManager = WireGuardTunnelManager()
     @StateObject private var serverListViewModel = ServerListViewModel()
     @StateObject private var connectionStore = ConnectionViewModelStore()
     @StateObject private var settingsStore = SettingsViewModelStore()
