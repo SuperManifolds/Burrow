@@ -14,6 +14,7 @@ struct BurrowApp: App {
     @StateObject private var connectionStore = ConnectionViewModelStore()
     @StateObject private var settingsStore = SettingsViewModelStore()
     @StateObject private var updaterViewModel = UpdaterViewModel()
+    @State private var notificationService = NotificationService()
 
     // MARK: - Body
 
@@ -58,7 +59,8 @@ struct BurrowApp: App {
                 MenuBarLabel(
                     connectionViewModel: connectionViewModel,
                     serverListViewModel: serverListViewModel,
-                    settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel)
+                    settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel),
+                    notificationService: notificationService
                 )
             }
         }
@@ -77,6 +79,7 @@ private struct MenuBarLabel: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
     @ObservedObject var settingsViewModel: SettingsViewModel
+    let notificationService: NotificationService
 
     var body: some View {
         HStack(spacing: 4) {
@@ -93,6 +96,7 @@ private struct MenuBarLabel: View {
             }
         }
         .task {
+            setupNotifications()
             if serverListViewModel.countries.isEmpty {
                 await serverListViewModel.loadRelays()
             }
@@ -100,6 +104,25 @@ private struct MenuBarLabel: View {
         .task {
             for await _ in KeyboardShortcuts.events(.keyUp, for: .toggleConnection) {
                 toggleConnection()
+            }
+        }
+    }
+
+    private func setupNotifications() {
+        connectionViewModel.notificationService = notificationService
+        connectionViewModel.settingsViewModel = settingsViewModel
+        connectionViewModel.relayLocationResolver = { [serverListViewModel] hostname in
+            guard let info = serverListViewModel.relayIndex[hostname] else { return nil }
+            let flag = info.countryCode.countryFlag
+            return ("\(flag) \(info.countryName) · \(info.cityName)", info.cityName)
+        }
+
+        notificationService.onDisconnect = { [connectionViewModel] in
+            await connectionViewModel.disconnect()
+        }
+        notificationService.onReconnect = { [connectionViewModel, serverListViewModel] in
+            if let relay = serverListViewModel.selectedRelay {
+                await connectionViewModel.connect(to: relay)
             }
         }
     }

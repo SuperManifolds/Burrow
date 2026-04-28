@@ -24,6 +24,10 @@ final class SettingsViewModel: ObservableObject {
         didSet { UserDefaults.standard.set(coloredMenuBarIcon, forKey: "colored_menu_bar_icon") }
     }
 
+    @Published var showConnectionNotifications: Bool {
+        didSet { UserDefaults.standard.set(showConnectionNotifications, forKey: "show_connection_notifications") }
+    }
+
     // MARK: - VPN Settings
 
     @Published var dnsOption: DNSOption {
@@ -77,6 +81,12 @@ final class SettingsViewModel: ObservableObject {
             ?? MenuBarDisplayMode.iconOnly.rawValue
         self.menuBarDisplay = MenuBarDisplayMode(rawValue: displayRaw) ?? .iconOnly
         self.coloredMenuBarIcon = UserDefaults.standard.bool(forKey: "colored_menu_bar_icon")
+
+        if UserDefaults.standard.object(forKey: "show_connection_notifications") == nil {
+            self.showConnectionNotifications = true
+        } else {
+            self.showConnectionNotifications = UserDefaults.standard.bool(forKey: "show_connection_notifications")
+        }
 
         let savedMTU = UserDefaults.standard.integer(forKey: "mtu_value")
         self.mtu = savedMTU > 0 ? savedMTU : TunnelDefaults.mtu

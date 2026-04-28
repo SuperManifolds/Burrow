@@ -19,7 +19,11 @@ final class ConnectionViewModel: ObservableObject {
     private let tunnelManager: any TunnelManaging
     private let accountViewModel: AccountViewModel
     var settingsViewModel: SettingsViewModel?
+    var notificationService: NotificationService?
+    var relayLocationResolver: ((String) -> (location: String, city: String)?)?
     private var durationTask: Task<Void, Never>?
+    private var disconnectIsUserInitiated = false
+    private var previousStatus: ConnectionStatus = .disconnected
 
     // MARK: - Initialization
 
@@ -35,13 +39,23 @@ final class ConnectionViewModel: ObservableObject {
         tunnelManager.connectedRelayPublisher
             .receive(on: RunLoop.main)
             .assign(to: &$connectedRelay)
+
+        $status
+            .receive(on: RunLoop.main)
+            .sink { [weak self] newStatus in
+                self?.handleStatusTransition(to: newStatus)
+            }
+            .store(in: &cancellables)
     }
+
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Public API
 
     /// Connect to a specific relay.
     func connect(to relay: Relay) async {
         error = nil
+        disconnectIsUserInitiated = false
 
         guard let device = accountViewModel.device else {
             error = String(localized: "No device registered. Try logging out and back in.")
@@ -68,11 +82,15 @@ final class ConnectionViewModel: ObservableObject {
         } catch {
             self.error = error.localizedDescription
             print("[Burrow] Connect error: \(error)")
+            if settingsViewModel?.showConnectionNotifications ?? true {
+                notificationService?.postConnectionFailed(error: error.localizedDescription)
+            }
         }
     }
 
     /// Disconnect from the current relay.
     func disconnect() async {
+        disconnectIsUserInitiated = true
         await tunnelManager.disconnect()
         stopDurationTimer()
         connectionDuration = 0
@@ -91,6 +109,29 @@ final class ConnectionViewModel: ObservableObject {
             await disconnect()
         } else {
             await connect(to: relay)
+        }
+    }
+
+    // MARK: - Status Transitions
+
+    private func handleStatusTransition(to newStatus: ConnectionStatus) {
+        defer { previousStatus = newStatus }
+
+        guard settingsViewModel?.showConnectionNotifications ?? true else { return }
+        guard let notificationService else { return }
+
+        switch (previousStatus, newStatus) {
+            case (.connecting, .connected):
+                let location = connectedRelay.flatMap { relayLocationResolver?($0.hostname) }
+                notificationService.postConnected(
+                    location: location?.location,
+                    hostname: connectedRelay?.hostname
+                )
+            case (.disconnecting, .disconnected), (.connected, .disconnected), (.connecting, .disconnected):
+                notificationService.postDisconnected(userInitiated: disconnectIsUserInitiated)
+                disconnectIsUserInitiated = false
+            default:
+                break
         }
     }
 

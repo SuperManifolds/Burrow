@@ -41,6 +41,7 @@ private struct GeneralSettingsTab: View {
         Form {
             Toggle("Launch Burrow at login", isOn: $settingsViewModel.launchAtLogin)
             Toggle("Auto-connect on launch", isOn: $settingsViewModel.autoConnect)
+            Toggle("Connection notifications", isOn: $settingsViewModel.showConnectionNotifications)
 
             Section("Keyboard Shortcut") {
                 KeyboardShortcuts.Recorder(
