@@ -40,6 +40,16 @@ private struct GeneralSettingsTab: View {
         Form {
             Toggle("Launch Burrow at login", isOn: $settingsViewModel.launchAtLogin)
             Toggle("Auto-connect on launch", isOn: $settingsViewModel.autoConnect)
+
+            Section("Menu Bar") {
+                Picker("Display", selection: $settingsViewModel.menuBarDisplay) {
+                    ForEach(MenuBarDisplayMode.allCases) { mode in
+                        Text(mode.displayName).tag(mode)
+                    }
+                }
+                Toggle("Colored icon", isOn: $settingsViewModel.coloredMenuBarIcon)
+            }
+
             Section {
                 Button("Check for Updates…") {
                     updaterViewModel.checkForUpdates()
@@ -99,6 +109,8 @@ private struct VPNSettingsTab: View {
 private struct DevicesSettingsTab: View {
     @ObservedObject var settingsViewModel: SettingsViewModel
     @ObservedObject var accountViewModel: AccountViewModel
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
         VStack(spacing: 0) {
@@ -110,10 +122,19 @@ private struct DevicesSettingsTab: View {
                 Spacer()
                 Text(error)
                     .foregroundStyle(.secondary)
-                Button("Retry") {
-                    Task { await settingsViewModel.loadDevices() }
+                if settingsViewModel.isDeviceErrorSessionExpired {
+                    Button(String(localized: "Log Out")) {
+                        accountViewModel.logout()
+                        openWindow(id: "main")
+                        NSApplication.shared.activate()
+                    }
+                    .buttonStyle(.bordered)
+                } else {
+                    Button(String(localized: "Retry")) {
+                        Task { await settingsViewModel.loadDevices() }
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
                 Spacer()
             } else if settingsViewModel.devices.isEmpty {
                 Spacer()

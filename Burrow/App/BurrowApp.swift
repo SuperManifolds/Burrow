@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import SwiftUI
 
@@ -53,8 +54,11 @@ struct BurrowApp: App {
             }
         } label: {
             if !isPreview {
-                Image(systemName: menuBarIcon)
-                    .symbolRenderingMode(.monochrome)
+                MenuBarLabel(
+                    connectionViewModel: connectionViewModel,
+                    serverListViewModel: serverListViewModel,
+                    settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel)
+                )
             }
         }
         .menuBarExtraStyle(.window)
@@ -64,14 +68,80 @@ struct BurrowApp: App {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
     }
 
-    private var menuBarIcon: String {
-        switch connectionStore.resolve(
-            tunnelManager: tunnelManager,
-            accountViewModel: accountViewModel
-        ).status {
+}
+
+// MARK: - Menu Bar Label
+
+private struct MenuBarLabel: View {
+    @ObservedObject var connectionViewModel: ConnectionViewModel
+    @ObservedObject var serverListViewModel: ServerListViewModel
+    @ObservedObject var settingsViewModel: SettingsViewModel
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if settingsViewModel.coloredMenuBarIcon {
+                Image(nsImage: coloredIcon)
+            } else {
+                Image(systemName: icon)
+                    .symbolRenderingMode(.monochrome)
+            }
+
+            if let statusText {
+                Text(statusText)
+                    .monospacedDigit()
+            }
+        }
+    }
+
+    private var icon: String {
+        switch connectionViewModel.status {
             case .connected: "checkmark.shield.fill"
             case .connecting, .disconnecting: "antenna.radiowaves.left.and.right"
             case .disconnected: "shield.slash"
+        }
+    }
+
+    private var coloredIcon: NSImage {
+        guard let base = NSImage(systemSymbolName: icon, accessibilityDescription: "Burrow") else {
+            return NSImage()
+        }
+        let config = NSImage.SymbolConfiguration(paletteColors: [iconNSColor])
+        let image = base.withSymbolConfiguration(config) ?? base
+        image.isTemplate = false
+        return image
+    }
+
+    private var iconNSColor: NSColor {
+        switch connectionViewModel.status {
+            case .connected: .systemGreen
+            case .connecting, .disconnecting: .systemOrange
+            case .disconnected: .secondaryLabelColor
+        }
+    }
+
+    private var statusText: String? {
+        guard case .connected = connectionViewModel.status else { return nil }
+
+        let mode = settingsViewModel.menuBarDisplay
+        guard mode != .iconOnly else { return nil }
+
+        let time = connectionViewModel.formattedDuration
+        let location: String? = {
+            guard let relay = connectionViewModel.connectedRelay,
+                  let info = serverListViewModel.relayIndex[relay.hostname] else { return nil }
+            return "\(info.countryCode.countryFlag) \(info.cityName)"
+        }()
+
+        switch mode {
+            case .iconOnly:
+                return nil
+            case .iconAndTime:
+                return time
+            case .iconAndLocation:
+                return location
+            case .iconAndBoth:
+                guard let location else { return time }
+                return "\(location) \(time)"
         }
     }
 }

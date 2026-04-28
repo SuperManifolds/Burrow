@@ -16,6 +16,14 @@ final class SettingsViewModel: ObservableObject {
         didSet { UserDefaults.standard.set(autoConnect, forKey: "auto_connect") }
     }
 
+    @Published var menuBarDisplay: MenuBarDisplayMode {
+        didSet { UserDefaults.standard.set(menuBarDisplay.rawValue, forKey: "menu_bar_display") }
+    }
+
+    @Published var coloredMenuBarIcon: Bool {
+        didSet { UserDefaults.standard.set(coloredMenuBarIcon, forKey: "colored_menu_bar_icon") }
+    }
+
     // MARK: - VPN Settings
 
     @Published var dnsOption: DNSOption {
@@ -39,6 +47,7 @@ final class SettingsViewModel: ObservableObject {
     @Published private(set) var devices: [Device] = []
     @Published private(set) var isLoadingDevices: Bool = false
     @Published private(set) var deviceError: String?
+    @Published private(set) var isDeviceErrorSessionExpired: Bool = false
     @Published private(set) var accountExpiry: Date?
 
     // MARK: - Dependencies
@@ -63,6 +72,11 @@ final class SettingsViewModel: ObservableObject {
 
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
         self.autoConnect = UserDefaults.standard.bool(forKey: "auto_connect")
+
+        let displayRaw = UserDefaults.standard.string(forKey: "menu_bar_display")
+            ?? MenuBarDisplayMode.iconOnly.rawValue
+        self.menuBarDisplay = MenuBarDisplayMode(rawValue: displayRaw) ?? .iconOnly
+        self.coloredMenuBarIcon = UserDefaults.standard.bool(forKey: "colored_menu_bar_icon")
 
         let savedMTU = UserDefaults.standard.integer(forKey: "mtu_value")
         self.mtu = savedMTU > 0 ? savedMTU : TunnelDefaults.mtu
@@ -93,6 +107,7 @@ final class SettingsViewModel: ObservableObject {
 
         isLoadingDevices = true
         deviceError = nil
+        isDeviceErrorSessionExpired = false
 
         do {
             async let devicesFetch = provider.listDevices(token: token)
@@ -101,6 +116,9 @@ final class SettingsViewModel: ObservableObject {
             accountExpiry = try? await expiryFetch
         } catch {
             deviceError = error.localizedDescription
+            if case VPNProviderError.unauthorized = error {
+                isDeviceErrorSessionExpired = true
+            }
         }
 
         isLoadingDevices = false
@@ -145,6 +163,24 @@ enum DNSOption: String, CaseIterable, Identifiable {
         switch self {
             case .mullvad: return String(localized: "Mullvad DNS (10.64.0.1)")
             case .custom: return String(localized: "Custom")
+        }
+    }
+}
+
+enum MenuBarDisplayMode: String, CaseIterable, Identifiable {
+    case iconOnly = "icon_only"
+    case iconAndTime = "icon_and_time"
+    case iconAndLocation = "icon_and_location"
+    case iconAndBoth = "icon_and_both"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+            case .iconOnly: return String(localized: "Icon only")
+            case .iconAndTime: return String(localized: "Icon + connected time")
+            case .iconAndLocation: return String(localized: "Icon + server location")
+            case .iconAndBoth: return String(localized: "Icon + location & time")
         }
     }
 }
