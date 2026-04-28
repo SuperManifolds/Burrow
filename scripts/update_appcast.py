@@ -17,14 +17,14 @@ def markdown_to_html(md: str) -> str:
     html_parts = [
         "<style>",
         "body { font-family: -apple-system, sans-serif; font-size: 13px; "
-        "line-height: 1.5; color: #333; }",
+        "line-height: 1.5; color: -apple-system-label; }",
         "h2 { font-size: 15px; margin: 16px 0 8px; }",
         "h3 { font-size: 14px; margin: 12px 0 6px; }",
         "ul { padding-left: 20px; margin: 4px 0; }",
         "li { margin: 2px 0; }",
-        "code { background: #f0f0f0; padding: 1px 4px; border-radius: 3px; "
-        "font-size: 12px; }",
-        "a { color: #0066cc; text-decoration: none; }",
+        "code { background: -apple-system-quaternary-label; "
+        "padding: 1px 4px; border-radius: 3px; font-size: 12px; }",
+        "a { color: -apple-system-blue; text-decoration: none; }",
         "</style>",
     ]
 
