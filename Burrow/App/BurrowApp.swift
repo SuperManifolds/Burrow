@@ -1,3 +1,4 @@
+import AppIntents
 import AppKit
 import Combine
 import KeyboardShortcuts
@@ -60,6 +61,7 @@ struct BurrowApp: App {
                     connectionViewModel: connectionViewModel,
                     serverListViewModel: serverListViewModel,
                     settingsViewModel: settingsStore.resolve(accountViewModel: accountViewModel),
+                    accountViewModel: accountViewModel,
                     notificationService: notificationService
                 )
             }
@@ -70,7 +72,6 @@ struct BurrowApp: App {
     private var isPreview: Bool {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
     }
-
 }
 
 // MARK: - Menu Bar Label
@@ -79,6 +80,7 @@ private struct MenuBarLabel: View {
     @ObservedObject var connectionViewModel: ConnectionViewModel
     @ObservedObject var serverListViewModel: ServerListViewModel
     @ObservedObject var settingsViewModel: SettingsViewModel
+    @ObservedObject var accountViewModel: AccountViewModel
     let notificationService: NotificationService
 
     var body: some View {
@@ -100,6 +102,7 @@ private struct MenuBarLabel: View {
             if serverListViewModel.countries.isEmpty {
                 await serverListViewModel.loadRelays()
             }
+            BurrowShortcuts.updateAppShortcutParameters()
         }
         .task {
             for await _ in KeyboardShortcuts.events(.keyUp, for: .toggleConnection) {
@@ -109,6 +112,10 @@ private struct MenuBarLabel: View {
     }
 
     private func setupNotifications() {
+        AppState.shared.connectionViewModel = connectionViewModel
+        AppState.shared.serverListViewModel = serverListViewModel
+        AppState.shared.accountViewModel = accountViewModel
+
         connectionViewModel.notificationService = notificationService
         connectionViewModel.settingsViewModel = settingsViewModel
         connectionViewModel.relayLocationResolver = { [serverListViewModel] hostname in
@@ -134,9 +141,7 @@ private struct MenuBarLabel: View {
         Task {
             if connectionViewModel.status.isActive {
                 await connectionViewModel.disconnect()
-            } else if let relay = serverListViewModel.selectedRelay
-                        ?? serverListViewModel.favouriteCities.first
-                            .flatMap({ serverListViewModel.selectRelay(in: $0.city) }) {
+            } else if let relay = serverListViewModel.bestAvailableRelay {
                 await connectionViewModel.connect(to: relay)
             }
         }

@@ -153,6 +153,11 @@ final class ServerListViewModel: ObservableObject {
         isLoading = false
     }
 
+    /// Returns the selected relay, or falls back to the top favourite city.
+    var bestAvailableRelay: Relay? {
+        selectedRelay ?? favouriteCities.first.flatMap { selectRelay(in: $0.city) }
+    }
+
     /// Select a random active relay from a specific city.
     func selectRelay(in city: RelayCityGroup) -> Relay? {
         let selector = WeightedRandomRelaySelector()
