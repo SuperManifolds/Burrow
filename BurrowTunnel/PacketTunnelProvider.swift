@@ -10,7 +10,7 @@ private enum TunnelLog {
     static let logURL: URL? = {
         FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup)?
-            .appendingPathComponent("tunnel.log")
+            .appendingPathComponent(TunnelIO.logFilename)
     }()
 
     static func write(_ message: String) {
@@ -211,7 +211,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
             guard let url = FileManager.default
                 .containerURL(forSecurityApplicationGroupIdentifier: AppIdentifiers.appGroup)?
-                .appendingPathComponent("tunnel.stats") else { return }
+                .appendingPathComponent(TunnelIO.statsFilename) else { return }
 
             let json = "{\"tx\":\(tx),\"rx\":\(rx)}"
             try? json.write(to: url, atomically: true, encoding: .utf8)

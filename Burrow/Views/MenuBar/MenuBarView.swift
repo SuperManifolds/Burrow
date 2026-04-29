@@ -35,7 +35,7 @@ struct MenuBarView: View {
                     .contentTransition(.symbolEffect(.replace))
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(connectionViewModel.status.displayText)
+                    Text(connectionViewModel.statusDisplayText)
                         .font(.headline)
 
                     if case .connected = connectionViewModel.status {
@@ -137,6 +137,9 @@ struct MenuBarView: View {
                 Button {
                     openWindow(id: "main")
                     NSApplication.shared.activate()
+                    NSApplication.shared.windows
+                        .first { $0.identifier?.rawValue == "main" }?
+                        .makeKeyAndOrderFront(nil)
                 } label: {
                     HStack {
                         Image(systemName: "macwindow")
@@ -162,6 +165,10 @@ struct MenuBarView: View {
                 .buttonStyle(MenuBarButtonStyle())
                 .simultaneousGesture(TapGesture().onEnded {
                     NSApplication.shared.activate()
+                    // Bring Settings window to front if already open
+                    NSApplication.shared.windows
+                        .first { $0.title.contains("Settings") }?
+                        .makeKeyAndOrderFront(nil)
                 })
 
                 Button {

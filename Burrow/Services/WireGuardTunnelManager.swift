@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import NetworkExtension
+import OSLog
 
 /// Manages the VPN tunnel lifecycle using NETunnelProviderManager.
 ///
@@ -27,27 +28,9 @@ final class WireGuardTunnelManager: ObservableObject, TunnelManaging {
     /// The bundle identifier for the Network Extension target.
     private let tunnelBundleIdentifier = AppIdentifiers.tunnelBundleID
 
-    /// The app group used to share data between the app and extension.
-    private let appGroupIdentifier = AppIdentifiers.appGroup
+    nonisolated func readTunnelLog() -> String? { TunnelIO.readLog() }
 
-    /// Read the diagnostic log from the tunnel extension.
-    nonisolated func readTunnelLog() -> String? {
-        guard let url = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
-            .appendingPathComponent("tunnel.log") else { return nil }
-        return try? String(contentsOf: url, encoding: .utf8)
-    }
-
-    /// Read transfer statistics from the shared container.
-    nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)? {
-        guard let url = FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
-            .appendingPathComponent("tunnel.stats"),
-              let data = try? Data(contentsOf: url),
-              let stats = try? JSONDecoder().decode(TransferStats.self, from: data)
-        else { return nil }
-        return (tx: stats.tx, rx: stats.rx)
-    }
+    nonisolated func readTransferStats() -> (tx: UInt64, rx: UInt64)? { TunnelIO.readStats() }
 
     // MARK: - Initialization
 
@@ -66,16 +49,16 @@ final class WireGuardTunnelManager: ObservableObject, TunnelManaging {
     /// Load or create the tunnel provider manager.
     func loadTunnelManager() async throws {
         let managers = try await NETunnelProviderManager.loadAllFromPreferences()
-        print("[Burrow WireGuard] Found \(managers.count) existing managers")
+        Log.tunnel.info("Found \(managers.count) existing managers")
 
         if let existing = managers.first(where: {
             ($0.protocolConfiguration as? NETunnelProviderProtocol)?
                 .providerBundleIdentifier == tunnelBundleIdentifier
         }) {
-            print("[Burrow WireGuard] Reusing existing manager")
+            Log.tunnel.info("Reusing existing manager")
             tunnelManager = existing
         } else {
-            print("[Burrow WireGuard] Creating new manager for \(tunnelBundleIdentifier)")
+            Log.tunnel.info("Creating new manager for \(self.tunnelBundleIdentifier)")
             tunnelManager = NETunnelProviderManager()
         }
     }
@@ -119,19 +102,19 @@ final class WireGuardTunnelManager: ObservableObject, TunnelManaging {
         manager.isEnabled = true
 
         // Save and start
-        print("[Burrow WireGuard] Saving preferences...")
+        Log.tunnel.info("Saving preferences...")
         try await manager.saveToPreferences()
-        print("[Burrow WireGuard] Loading preferences...")
+        Log.tunnel.info("Loading preferences...")
         try await manager.loadFromPreferences()
 
         guard let session = manager.connection as? NETunnelProviderSession else {
-            print("[Burrow WireGuard] ERROR: connection is not NETunnelProviderSession, got: \(type(of: manager.connection))")
+            Log.tunnel.error("Connection is not NETunnelProviderSession, got: \(type(of: manager.connection))")
             throw TunnelError.invalidSession
         }
 
-        print("[Burrow WireGuard] Starting tunnel...")
+        Log.tunnel.info("Starting tunnel...")
         try session.startTunnel(options: nil)
-        print("[Burrow WireGuard] startTunnel called successfully")
+        Log.tunnel.info("startTunnel called successfully")
 
         connectedRelay = relay
         status = .connecting
@@ -161,7 +144,7 @@ final class WireGuardTunnelManager: ObservableObject, TunnelManaging {
                 return
             }
             Task { @MainActor in
-                print("[Burrow WireGuard] NEVPNStatusDidChange: \(connection.status.rawValue) at \(Date())")
+                Log.tunnel.info("NEVPNStatusDidChange: \(connection.status.rawValue) at \(Date())")
                 self.updateStatus(from: connection.status)
             }
         }

@@ -30,6 +30,13 @@ final class SettingsViewModel: ObservableObject {
 
     // MARK: - VPN Settings
 
+    @Published var performanceMode: Bool {
+        didSet {
+            UserDefaults.standard.set(performanceMode, forKey: SettingsKeys.performanceMode)
+            updateDaemonRegistration()
+        }
+    }
+
     @Published var dnsOption: DNSOption {
         didSet { UserDefaults.standard.set(dnsOption.rawValue, forKey: "dns_option") }
     }
@@ -45,6 +52,8 @@ final class SettingsViewModel: ObservableObject {
     @Published var mtu: Int {
         didSet { UserDefaults.standard.set(mtu, forKey: "mtu_value") }
     }
+
+    @Published private(set) var daemonError: String?
 
     // MARK: - Device Management
 
@@ -88,8 +97,15 @@ final class SettingsViewModel: ObservableObject {
             self.showConnectionNotifications = UserDefaults.standard.bool(forKey: "show_connection_notifications")
         }
 
+        self.performanceMode = UserDefaults.standard.bool(forKey: SettingsKeys.performanceMode)
+
         let savedMTU = UserDefaults.standard.integer(forKey: "mtu_value")
         self.mtu = savedMTU > 0 ? savedMTU : TunnelDefaults.mtu
+
+        // Re-register daemon on launch to pick up updated binary
+        if performanceMode {
+            restartDaemon()
+        }
     }
 
     // MARK: - Public API
@@ -157,6 +173,63 @@ final class SettingsViewModel: ObservableObject {
         } catch {
             // Revert on failure
             launchAtLogin = SMAppService.mainApp.status == .enabled
+        }
+    }
+
+    private static let daemonService = SMAppService.daemon(
+        plistName: "\(AppIdentifiers.daemonBundleID).plist"
+    )
+
+    private var isUpdatingDaemon = false
+
+    private func restartDaemon() {
+        daemonError = nil
+
+        // Ensure daemon is registered
+        do {
+            try Self.daemonService.register()
+        } catch {
+            daemonError = String(localized: """
+                Failed to start performance mode daemon. \
+                Check System Settings > Login Items.
+                """)
+            return
+        }
+
+        // Ask the daemon to exit via XPC — launchd will restart it
+        // with the latest binary from the app bundle.
+        let conn = NSXPCConnection(machServiceName: AppIdentifiers.daemonBundleID, options: .privileged)
+        conn.remoteObjectInterface = NSXPCInterface(with: BurrowDaemonXPC.self)
+        conn.resume()
+        let proxy = conn.remoteObjectProxyWithErrorHandler { _ in } as? BurrowDaemonXPC
+        proxy?.restart { conn.invalidate() }
+    }
+
+    private func updateDaemonRegistration() {
+        guard !isUpdatingDaemon else { return }
+        isUpdatingDaemon = true
+        defer { isUpdatingDaemon = false }
+
+        daemonError = nil
+
+        if Self.daemonService.status == .requiresApproval {
+            daemonError = String(localized: """
+                Please enable Burrow in System Settings > \
+                Login Items to use performance mode.
+                """)
+            SMAppService.openSystemSettingsLoginItems()
+            return
+        }
+
+        do {
+            if performanceMode {
+                try Self.daemonService.register()
+            } else {
+                try Self.daemonService.unregister()
+            }
+        } catch {
+            daemonError = String(localized: "Failed to enable performance mode. Check System Settings > Login Items.")
+            performanceMode = Self.daemonService.status == .enabled
         }
     }
 }

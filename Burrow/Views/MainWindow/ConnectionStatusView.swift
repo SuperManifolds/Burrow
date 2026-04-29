@@ -17,7 +17,7 @@ struct ConnectionStatusView: View {
                 .symbolEffect(.pulse, isActive: connectionViewModel.status == .connecting)
                 .contentTransition(.symbolEffect(.replace))
                 .scaleEffect(iconScale)
-                .accessibilityLabel(connectionViewModel.status.displayText)
+                .accessibilityLabel(connectionViewModel.statusDisplayText)
                 .onChange(of: connectionViewModel.status) {
                     withAnimation(.spring(duration: 0.4, bounce: 0.5)) {
                         iconScale = 1.15
@@ -26,7 +26,7 @@ struct ConnectionStatusView: View {
                         iconScale = 1.0
                     }
                     AccessibilityNotification.Announcement(
-                        connectionViewModel.status.displayText
+                        connectionViewModel.statusDisplayText
                     ).post()
                 }
 

@@ -3,15 +3,17 @@ import SwiftUI
 /// A colored pill showing the current connection status.
 struct StatusBadge: View {
     let status: ConnectionStatus
+    var overrideText: String?
 
     var body: some View {
+        let text = overrideText ?? status.displayText
         HStack(spacing: 6) {
             Circle()
                 .fill(Color.connectionStatus(status))
                 .frame(width: 8, height: 8)
                 .accessibilityHidden(true)
 
-            Text(status.displayText)
+            Text(text)
                 .font(.caption)
                 .fontWeight(.medium)
         }
@@ -22,7 +24,7 @@ struct StatusBadge: View {
                 .fill(Color.connectionStatus(status).opacity(0.15))
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "VPN status: \(status.displayText)"))
+        .accessibilityLabel(String(localized: "VPN status: \(text)"))
     }
 }
 

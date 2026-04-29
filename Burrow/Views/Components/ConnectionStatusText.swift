@@ -7,7 +7,7 @@ struct ConnectionStatusText: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Text(connectionViewModel.status.displayText)
+            Text(connectionViewModel.statusDisplayText)
                 .font(.title2)
                 .fontWeight(.semibold)
 

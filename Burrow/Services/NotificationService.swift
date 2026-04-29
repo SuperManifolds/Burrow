@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import UserNotifications
 
 /// Posts macOS notifications for VPN connection state changes.
@@ -116,7 +117,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         do {
             isAuthorized = try await center.requestAuthorization(options: [.alert, .sound])
         } catch {
-            print("[Burrow Notifications] Permission request failed: \(error)")
+            Log.notifications.error("Permission request failed: \(error)")
         }
     }
 

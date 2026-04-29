@@ -21,3 +21,9 @@ DerivedData/
 # Secrets
 .env
 *.key
+
+# Build output
+build/
+
+# Built binaries (compiled from source in CI and local build scripts)
+Burrow/Resources/gotatun

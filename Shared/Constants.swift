@@ -8,6 +8,9 @@ enum AppIdentifiers: Sendable {
     /// Network Extension tunnel bundle identifier.
     nonisolated static let tunnelBundleID = "io.sorlie.Burrow.BurrowTunnel"
 
+    /// LaunchDaemon bundle identifier and Mach service name.
+    nonisolated static let daemonBundleID = "io.sorlie.Burrow.BurrowDaemon"
+
     /// App group shared between the app and tunnel extension.
     nonisolated static let appGroup = "group.com.burrow.vpn"
 }
@@ -24,6 +27,11 @@ extension TransferStats: Codable {
         self.tx = try container.decode(UInt64.self, forKey: .tx)
         self.rx = try container.decode(UInt64.self, forKey: .rx)
     }
+}
+
+/// UserDefaults keys shared between app components.
+enum SettingsKeys: Sendable {
+    nonisolated static let performanceMode = "performance_mode"
 }
 
 /// Default tunnel configuration values.

@@ -1,5 +1,7 @@
 import Combine
 import Foundation
+import Network
+import OSLog
 
 /// Manages VPN connection state and coordinates between tunnel manager and UI.
 @MainActor
@@ -13,6 +15,7 @@ final class ConnectionViewModel: ObservableObject {
     @Published private(set) var error: String?
     @Published private(set) var transferTx: UInt64 = 0
     @Published private(set) var transferRx: UInt64 = 0
+    @Published private(set) var isConnectivityVerified: Bool = false
 
     // MARK: - Dependencies
 
@@ -59,13 +62,13 @@ final class ConnectionViewModel: ObservableObject {
 
         guard let device = accountViewModel.device else {
             error = String(localized: "No device registered. Try logging out and back in.")
-            print("[Burrow] Connect failed: no device")
+            Log.connection.error("Connect failed: no device")
             return
         }
 
         guard let privateKey = accountViewModel.privateKey() else {
             error = String(localized: "Missing private key. Try logging out and back in.")
-            print("[Burrow] Connect failed: no private key")
+            Log.connection.error("Connect failed: no private key")
             return
         }
 
@@ -73,15 +76,16 @@ final class ConnectionViewModel: ObservableObject {
             let port = settingsViewModel?.effectivePort ?? TunnelDefaults.port
             let dns = settingsViewModel?.effectiveDNS ?? TunnelDefaults.dns
             let mtu = settingsViewModel?.effectiveMTU ?? TunnelDefaults.mtu
-            print("[Burrow] Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port), MTU:\(mtu))")
+            Log.connection.info("Connecting to \(relay.hostname) (\(relay.ipv4AddrIn):\(port), MTU:\(mtu))")
             try await tunnelManager.connect(
                 to: relay, with: device, privateKey: privateKey,
                 port: port, dns: dns, mtu: mtu
             )
             startDurationTimer()
+            verifyConnectivity()
         } catch {
             self.error = error.localizedDescription
-            print("[Burrow] Connect error: \(error)")
+            Log.connection.error("Connect error: \(error)")
             if settingsViewModel?.showConnectionNotifications ?? true {
                 notificationService?.postConnectionFailed(error: error.localizedDescription)
             }
@@ -91,6 +95,7 @@ final class ConnectionViewModel: ObservableObject {
     /// Disconnect from the current relay.
     func disconnect() async {
         disconnectIsUserInitiated = true
+        stopVerification()
         await tunnelManager.disconnect()
         stopDurationTimer()
         connectionDuration = 0
@@ -109,6 +114,91 @@ final class ConnectionViewModel: ObservableObject {
             await disconnect()
         } else {
             await connect(to: relay)
+        }
+    }
+
+    // MARK: - Connectivity Verification
+
+    private static let connectivityMaxAttempts = 3
+    private static let connectivityRetryInterval: Duration = .seconds(2)
+    private static let connectivityProbeTimeout: Double = 3
+
+    private var verificationTask: Task<Void, Never>?
+
+    private func verifyConnectivity() {
+        verificationTask?.cancel()
+        isConnectivityVerified = false
+
+        verificationTask = Task {
+            for attempt in 1...Self.connectivityMaxAttempts {
+                guard !Task.isCancelled, status.isActive else { return }
+
+                if await probeConnectivity() {
+                    guard !Task.isCancelled else { return }
+                    isConnectivityVerified = true
+                    return
+                }
+
+                if attempt < Self.connectivityMaxAttempts {
+                    try? await Task.sleep(for: Self.connectivityRetryInterval)
+                }
+            }
+
+            // All attempts failed
+            guard !Task.isCancelled, status.isActive else { return }
+            error = String(localized: "Connected but internet is not reachable")
+        }
+    }
+
+    private func stopVerification() {
+        verificationTask?.cancel()
+        verificationTask = nil
+        isConnectivityVerified = false
+    }
+
+    private func probeConnectivity() async -> Bool {
+        let dns = settingsViewModel?.effectiveDNS ?? TunnelDefaults.dns
+        return await withCheckedContinuation { cont in
+            let host = NWEndpoint.Host(dns)
+            guard let port = NWEndpoint.Port(rawValue: 53) else {
+                cont.resume(returning: false)
+                return
+            }
+
+            let lock = NSLock()
+            var resumed = false
+            let finish = { (result: Bool) in
+                lock.lock()
+                let shouldResume = !resumed
+                resumed = true
+                lock.unlock()
+                if shouldResume {
+                    cont.resume(returning: result)
+                }
+            }
+
+            let connection = NWConnection(host: host, port: port, using: .tcp)
+
+            let timeout = DispatchWorkItem { [weak connection] in
+                connection?.cancel()
+                finish(false)
+            }
+            DispatchQueue.global().asyncAfter(deadline: .now() + Self.connectivityProbeTimeout, execute: timeout)
+
+            connection.stateUpdateHandler = { state in
+                switch state {
+                    case .ready:
+                        timeout.cancel()
+                        connection.cancel()
+                        finish(true)
+                    case .failed, .cancelled:
+                        timeout.cancel()
+                        finish(false)
+                    default:
+                        break
+                }
+            }
+            connection.start(queue: .global())
         }
     }
 
@@ -165,9 +255,22 @@ final class ConnectionViewModel: ObservableObject {
     }
 }
 
-// MARK: - Duration Formatting
+// MARK: - Display
 
 extension ConnectionViewModel {
+    /// Status text accounting for connectivity verification.
+    var statusDisplayText: String {
+        switch status {
+            case .connected:
+                if isConnectivityVerified {
+                    return String(localized: "Connected")
+                }
+                return String(localized: "Verifying...")
+            default:
+                return status.displayText
+        }
+    }
+
     /// Formatted duration string (e.g. "01:23:45").
     var formattedDuration: String {
         let hours = Int(connectionDuration) / 3600

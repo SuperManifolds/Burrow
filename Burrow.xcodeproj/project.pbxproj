@@ -17,6 +17,22 @@
 		FA88BD842F85805D00690D80 /* WireGuardKit in Frameworks */ = {isa = PBXBuildFile; productRef = FA88BD832F85805D00690D80 /* WireGuardKit */; };
 		FA9F77D92F87B3F0004B3228 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FA9F77D82F87B3F0004B3228 /* Sparkle */; };
 		FAA1B0012FA0000000000001 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = FAA1B0002FA0000000000001 /* KeyboardShortcuts */; };
+		FAD00001000000000000000A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5CF2AC05C44C7B8262BA3D /* Constants.swift */; };
+		FAD00002000000000000000B /* DaemonXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD00010000000000000000E /* DaemonXPC.swift */; };
+		FAD00004000000000000001A /* DaemonXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD00010000000000000000E /* DaemonXPC.swift */; };
+		FAD00008000000000000001E /* DaemonXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD00010000000000000000E /* DaemonXPC.swift */; };
+		FAD00080000000000000008A /* BurrowDaemon in Copy Daemon */ = {isa = PBXBuildFile; fileRef = FAD00020000000000000002A /* BurrowDaemon */; };
+		FAD00081000000000000008B /* io.sorlie.Burrow.BurrowDaemon.plist in Copy Daemon Plist */ = {isa = PBXBuildFile; fileRef = FAD00082000000000000008C /* io.sorlie.Burrow.BurrowDaemon.plist */; };
+		FAD000D1000000000000D1D1 /* TunnelIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000D0000000000000D0D0 /* TunnelIO.swift */; };
+		FAD000D2000000000000D2D2 /* TunnelIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000D0000000000000D0D0 /* TunnelIO.swift */; };
+		FAD000D3000000000000D3D3 /* TunnelIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000D0000000000000D0D0 /* TunnelIO.swift */; };
+		FAD000D4000000000000D4D4 /* TunnelIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000D0000000000000D0D0 /* TunnelIO.swift */; };
+		FAD000D5000000000000D5D5 /* TunnelIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000D0000000000000D0D0 /* TunnelIO.swift */; };
+		FAD000E1000000000000E1E1 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000E0000000000000E0E0 /* Log.swift */; };
+		FAD000E2000000000000E2E2 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000E0000000000000E0E0 /* Log.swift */; };
+		FAD000E3000000000000E3E3 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000E0000000000000E0E0 /* Log.swift */; };
+		FAD000E4000000000000E4E4 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000E0000000000000E0E0 /* Log.swift */; };
+		FAD000E5000000000000E5E5 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD000E0000000000000E0E0 /* Log.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +57,13 @@
 			remoteGlobalIDString = FA88BD712F85800E00690D80;
 			remoteInfo = BurrowTunnel;
 		};
+		FAD00090000000000000009A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA1E6B312F8572E500F6F863 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FAD00060000000000000006A;
+			remoteInfo = BurrowDaemon;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +76,28 @@
 				FA88BD7D2F85800E00690D80 /* BurrowTunnel.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAD000A0000000000000A0A0 /* Copy Daemon */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/HelperTools;
+			dstSubfolderSpec = 1;
+			files = (
+				FAD00080000000000000008A /* BurrowDaemon in Copy Daemon */,
+			);
+			name = "Copy Daemon";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAD000B0000000000000B0B0 /* Copy Daemon Plist */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LaunchDaemons;
+			dstSubfolderSpec = 1;
+			files = (
+				FAD00081000000000000008B /* io.sorlie.Burrow.BurrowDaemon.plist in Copy Daemon Plist */,
+			);
+			name = "Copy Daemon Plist";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -68,6 +113,11 @@
 		FA88BD722F85800E00690D80 /* BurrowTunnel.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BurrowTunnel.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA88BD742F85800E00690D80 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		FABC97752F86FE6C00DF6425 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		FAD00010000000000000000E /* DaemonXPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonXPC.swift; sourceTree = "<group>"; };
+		FAD00020000000000000002A /* BurrowDaemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BurrowDaemon; sourceTree = BUILT_PRODUCTS_DIR; };
+		FAD00082000000000000008C /* io.sorlie.Burrow.BurrowDaemon.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = io.sorlie.Burrow.BurrowDaemon.plist; path = BurrowDaemon/LaunchDaemons/io.sorlie.Burrow.BurrowDaemon.plist; sourceTree = SOURCE_ROOT; };
+		FAD000D0000000000000D0D0 /* TunnelIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelIO.swift; sourceTree = "<group>"; };
+		FAD000E0000000000000E0E0 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -102,6 +152,11 @@
 				FA88BD7E2F85800E00690D80 /* Exceptions for "BurrowTunnel" folder in "BurrowTunnel" target */,
 			);
 			path = BurrowTunnel;
+			sourceTree = "<group>";
+		};
+		FAD00030000000000000003A /* BurrowDaemon */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BurrowDaemon;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -139,6 +194,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FAD00040000000000000004A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -146,8 +208,19 @@
 			isa = PBXGroup;
 			children = (
 				6E5CF2AC05C44C7B8262BA3D /* Constants.swift */,
+				FAD00010000000000000000E /* DaemonXPC.swift */,
+				FAD000D0000000000000D0D0 /* TunnelIO.swift */,
+				FAD000E0000000000000E0E0 /* Log.swift */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		FA0031152FA1421C0093C002 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				FAD00082000000000000008C /* io.sorlie.Burrow.BurrowDaemon.plist */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		FA1E6B302F8572E500F6F863 = {
@@ -157,6 +230,7 @@
 				FA1E6B492F8572E600F6F863 /* BurrowTests */,
 				FA1E6B532F8572E600F6F863 /* BurrowUITests */,
 				FA88BD762F85800E00690D80 /* BurrowTunnel */,
+				FAD00030000000000000003A /* BurrowDaemon */,
 				FA88BD732F85800E00690D80 /* Frameworks */,
 				FA1E6B3A2F8572E500F6F863 /* Products */,
 				2A8A3CB0DBF540D78BDEF570 /* Shared */,
@@ -164,6 +238,7 @@
 				FA66DAB32F868648002127EF /* CONTRIBUTING.md */,
 				FA66DAB42F868759002127EF /* LICENSE */,
 				FABC97752F86FE6C00DF6425 /* README.md */,
+				FA0031152FA1421C0093C002 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -174,6 +249,7 @@
 				FA1E6B462F8572E600F6F863 /* BurrowTests.xctest */,
 				FA1E6B502F8572E600F6F863 /* BurrowUITests.xctest */,
 				FA88BD722F85800E00690D80 /* BurrowTunnel.appex */,
+				FAD00020000000000000002A /* BurrowDaemon */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -193,16 +269,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FA1E6B5A2F8572E600F6F863 /* Build configuration list for PBXNativeTarget "Burrow" */;
 			buildPhases = (
+				FAD000C0000000000000C0C0 /* Build GotaTun */,
 				FA1E6B352F8572E500F6F863 /* Sources */,
 				FA1E6B362F8572E500F6F863 /* Frameworks */,
 				FA1E6B372F8572E500F6F863 /* Resources */,
 				FA88BD822F85800E00690D80 /* Embed Foundation Extensions */,
+				FAD000A0000000000000A0A0 /* Copy Daemon */,
+				FAD000B0000000000000B0B0 /* Copy Daemon Plist */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				FA12DF4D2F86762100EC7456 /* PBXTargetDependency */,
 				FA88BD7C2F85800E00690D80 /* PBXTargetDependency */,
+				FAD00091000000000000009B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FA1E6B3B2F8572E500F6F863 /* Burrow */,
@@ -287,6 +367,27 @@
 			productReference = FA88BD722F85800E00690D80 /* BurrowTunnel.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		FAD00060000000000000006A /* BurrowDaemon */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FAD00070000000000000007A /* Build configuration list for PBXNativeTarget "BurrowDaemon" */;
+			buildPhases = (
+				FAD00050000000000000005A /* Sources */,
+				FAD00040000000000000004A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FAD00030000000000000003A /* BurrowDaemon */,
+			);
+			name = BurrowDaemon;
+			packageProductDependencies = (
+			);
+			productName = BurrowDaemon;
+			productReference = FAD00020000000000000002A /* BurrowDaemon */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -309,6 +410,9 @@
 						TestTargetID = FA1E6B382F8572E500F6F863;
 					};
 					FA88BD712F85800E00690D80 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					FAD00060000000000000006A = {
 						CreatedOnToolsVersion = 26.4;
 					};
 				};
@@ -337,6 +441,7 @@
 				FA1E6B452F8572E600F6F863 /* BurrowTests */,
 				FA1E6B4F2F8572E600F6F863 /* BurrowUITests */,
 				FA88BD712F85800E00690D80 /* BurrowTunnel */,
+				FAD00060000000000000006A /* BurrowDaemon */,
 			);
 		};
 /* End PBXProject section */
@@ -392,6 +497,25 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# Build WireGuard Go library (wg-go + maybenot)\nWG_GO_DIR=\"${BUILD_DIR%Build/*}SourcePackages/checkouts/wireguard-apple/Sources/WireGuardKitGo\"\n\nif [ ! -f \"${BUILT_PRODUCTS_DIR}/libwg-go.a\" ]; then\n    echo \"Building libwg-go.a...\"\n    export PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\"\n    /usr/bin/make -C \"$WG_GO_DIR\" ARCHS=\"${ARCHS}\" PLATFORM_NAME=\"${PLATFORM_NAME}\" CONFIGURATION_BUILD_DIR=\"${BUILT_PRODUCTS_DIR}\"\nfi\n";
 		};
+		FAD000C0000000000000C0C0 /* Build GotaTun */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build GotaTun";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Burrow/Resources/gotatun",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "export PATH=\"$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH\"\n\"$SRCROOT/scripts/build_gotatun.sh\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -400,6 +524,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA143D932F86542000E2E7E0 /* Constants.swift in Sources */,
+				FAD00004000000000000001A /* DaemonXPC.swift in Sources */,
+				FAD000D1000000000000D1D1 /* TunnelIO.swift in Sources */,
+				FAD000E1000000000000E1E1 /* Log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +535,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA143D942F86542000E2E7E0 /* Constants.swift in Sources */,
+				FAD000D2000000000000D2D2 /* TunnelIO.swift in Sources */,
+				FAD000E2000000000000E2E2 /* Log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +545,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA143D952F86542000E2E7E0 /* Constants.swift in Sources */,
+				FAD000D3000000000000D3D3 /* TunnelIO.swift in Sources */,
+				FAD000E3000000000000E3E3 /* Log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +555,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA143D962F86542000E2E7E0 /* Constants.swift in Sources */,
+				FAD00008000000000000001E /* DaemonXPC.swift in Sources */,
+				FAD000D4000000000000D4D4 /* TunnelIO.swift in Sources */,
+				FAD000E4000000000000E4E4 /* Log.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FAD00050000000000000005A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAD00001000000000000000A /* Constants.swift in Sources */,
+				FAD00002000000000000000B /* DaemonXPC.swift in Sources */,
+				FAD000D5000000000000D5D5 /* TunnelIO.swift in Sources */,
+				FAD000E5000000000000E5E5 /* Log.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +597,11 @@
 			isa = PBXTargetDependency;
 			target = FA88BD712F85800E00690D80 /* BurrowTunnel */;
 			targetProxy = FA88BD7B2F85800E00690D80 /* PBXContainerItemProxy */;
+		};
+		FAD00091000000000000009B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FAD00060000000000000006A /* BurrowDaemon */;
+			targetProxy = FAD00090000000000000009A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -587,7 +737,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 9X89US848J;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -626,7 +776,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 9X89US848J;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -740,7 +890,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 9X89US848J;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -773,7 +923,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 9X89US848J;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -795,6 +945,46 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FAD00071000000000000007B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BurrowDaemon/BurrowDaemon.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = BurrowDaemon/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow.BurrowDaemon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FAD00072000000000000007C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BurrowDaemon/BurrowDaemon.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 9X89US848J;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = BurrowDaemon/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 0.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.sorlie.Burrow.BurrowDaemon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -843,6 +1033,15 @@
 			buildConfigurations = (
 				FA88BD802F85800E00690D80 /* Debug */,
 				FA88BD812F85800E00690D80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FAD00070000000000000007A /* Build configuration list for PBXNativeTarget "BurrowDaemon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FAD00071000000000000007B /* Debug */,
+				FAD00072000000000000007C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

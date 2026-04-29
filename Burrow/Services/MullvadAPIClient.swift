@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// Mullvad VPN provider implementation.
 final class MullvadAPIClient: VPNProvider, Sendable {
@@ -114,7 +115,7 @@ final class MullvadAPIClient: VPNProvider, Sendable {
         }
 
         let bodyString = String(data: data, encoding: .utf8)
-        print("[Burrow API] registerDevice response \(httpResponse.statusCode): \(bodyString ?? "nil")")
+        Log.api.info("registerDevice response \(httpResponse.statusCode): \(bodyString ?? "nil")")
 
         switch httpResponse.statusCode {
             case 200, 201:

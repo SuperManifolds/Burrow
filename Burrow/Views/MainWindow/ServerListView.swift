@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 /// Sidebar view showing relay servers grouped by country and city.
@@ -154,11 +155,9 @@ struct ServerListView: View {
         Menu {
             Button("Print Tunnel Log") {
                 if let log = connectionViewModel.readTunnelLog() {
-                    print("=== TUNNEL LOG ===")
-                    print(log)
-                    print("=== END TUNNEL LOG ===")
+                    Log.tunnel.info("=== TUNNEL LOG ===\n\(log)\n=== END ===")
                 } else {
-                    print("[Burrow] No tunnel log available")
+                    Log.tunnel.info("No tunnel log available")
                 }
             }
             Divider()

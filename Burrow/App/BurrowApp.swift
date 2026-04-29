@@ -10,7 +10,12 @@ struct BurrowApp: App {
     // MARK: - State
 
     @StateObject private var accountViewModel = AccountViewModel()
-    @StateObject private var tunnelManager = WireGuardTunnelManager()
+    @State private var tunnelManager: any TunnelManaging = {
+        if UserDefaults.standard.bool(forKey: SettingsKeys.performanceMode) {
+            return GotaTunDaemonManager()
+        }
+        return WireGuardTunnelManager()
+    }()
     @StateObject private var serverListViewModel = ServerListViewModel()
     @StateObject private var connectionStore = ConnectionViewModelStore()
     @StateObject private var settingsStore = SettingsViewModelStore()
@@ -44,6 +49,7 @@ struct BurrowApp: App {
                 accountViewModel: accountViewModel,
                 updaterViewModel: updaterViewModel
             )
+            .environmentObject(connectionViewModel)
         }
 
         MenuBarExtra {

@@ -80,6 +80,15 @@ jobs:
 
       # ── Build ────────────────────────────────────────────────────
 
+      - name: Build gotatun-cli
+        run: |
+          cargo install gotatun-cli@0.1.0 \
+            --root $RUNNER_TEMP/gotatun-build \
+            --target aarch64-apple-darwin
+          cp $RUNNER_TEMP/gotatun-build/bin/gotatun-cli \
+            Burrow/Resources/gotatun
+          chmod +x Burrow/Resources/gotatun
+
       - name: Resolve packages
         run: |
           xcodebuild -project Burrow.xcodeproj \
@@ -139,6 +148,17 @@ jobs:
                 --sign "Developer ID Application" "$f"
             done
           fi
+
+          # Sign the gotatun binary
+          codesign --force --options runtime --timestamp \
+            --sign "Developer ID Application" \
+            "$APP_PATH/Contents/Resources/gotatun"
+
+          # Sign the daemon
+          codesign --force --options runtime --timestamp \
+            --sign "Developer ID Application" \
+            --entitlements BurrowDaemon/BurrowDaemon.entitlements \
+            "$APP_PATH/Contents/Library/HelperTools/BurrowDaemon"
 
           # Sign the Network Extension
           codesign --force --options runtime --timestamp \

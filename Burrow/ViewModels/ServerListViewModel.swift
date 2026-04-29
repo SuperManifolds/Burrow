@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import OSLog
 
 /// Manages the relay server list — fetching, grouping, searching, and selection.
 @MainActor
@@ -136,7 +137,7 @@ final class ServerListViewModel: ObservableObject {
 
     /// Fetch and group the relay list.
     func loadRelays() async {
-        print("[Burrow] loadRelays called")
+        Log.relays.info("Loading relays")
         isLoading = true
         error = nil
 
@@ -216,7 +217,7 @@ final class ServerListViewModel: ObservableObject {
 
     /// Measure ping to one relay per city.
     private func measurePings() {
-        print("[Burrow Pings] Starting ping measurement for \(countries.flatMap(\.cities).count) cities")
+        Log.relays.info("Starting ping measurement for \(self.countries.flatMap(\.cities).count) cities")
         let targets: [(String, String)] = countries.flatMap { $0.cities }.compactMap { city in
             guard let relay = city.relays.first(where: \.active) else { return nil }
             return (city.id, relay.ipv4AddrIn)

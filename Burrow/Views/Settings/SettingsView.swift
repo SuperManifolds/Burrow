@@ -74,9 +74,30 @@ private struct GeneralSettingsTab: View {
 
 private struct VPNSettingsTab: View {
     @ObservedObject var settingsViewModel: SettingsViewModel
+    @EnvironmentObject var connectionViewModel: ConnectionViewModel
 
     var body: some View {
         Form {
+            Section {
+                Toggle(
+                    String(localized: "Performance mode"),
+                    isOn: $settingsViewModel.performanceMode
+                )
+                .disabled(connectionViewModel.status.isActive)
+                Text(String(localized: """
+                    Uses GotaTun with direct utun access for \
+                    higher throughput. Disconnect before changing. \
+                    Requires an app restart.
+                    """))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let error = settingsViewModel.daemonError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+            }
+
             Section("DNS") {
                 Picker("DNS Server", selection: $settingsViewModel.dnsOption) {
                     ForEach(DNSOption.allCases) { option in

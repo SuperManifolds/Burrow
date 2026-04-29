@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import OSLog
 
 /// Manages account authentication, device registration, and credential storage.
 @MainActor
@@ -54,14 +55,14 @@ final class AccountViewModel: ObservableObject {
         error = nil
         isDeviceLimitError = false
         loginStep = .authenticating
-        print("[Burrow Login] Starting login for account \(cleaned.prefix(4))****")
+        Log.account.info("Starting login for account \(cleaned.prefix(4))****")
 
         do {
             // Authenticate
-            print("[Burrow Login] Authenticating...")
+            Log.account.info("Authenticating...")
             let cred = try await provider.authenticate(accountNumber: cleaned)
             credential = cred
-            print("[Burrow Login] Authenticated, token expires \(cred.expiry)")
+            Log.account.info("Authenticated, token expires \(cred.expiry)")
 
             // Save account number and token
             try keychain.save(Data(cleaned.utf8), forKey: KeychainService.Key.accountNumber)
@@ -69,20 +70,20 @@ final class AccountViewModel: ObservableObject {
 
             // Generate keypair
             loginStep = .generatingKeys
-            print("[Burrow Login] Generating keypair...")
+            Log.account.info("Generating keypair...")
             let keyPair = KeyPairGenerator.generateKeyPair()
             try keychain.save(keyPair.privateKey, forKey: KeychainService.Key.privateKey)
-            print("[Burrow Login] Keypair generated, public key: \(keyPair.publicKeyBase64.prefix(8))...")
+            Log.account.info("Keypair generated, public key: \(keyPair.publicKeyBase64.prefix(8))...")
 
             // Register device
             loginStep = .registeringDevice
-            print("[Burrow Login] Registering device...")
+            Log.account.info("Registering device...")
             let dev = try await provider.registerDevice(
                 token: cred.accessToken,
                 publicKey: keyPair.publicKeyBase64
             )
             device = dev
-            print("[Burrow Login] Device registered: \(dev.name) (\(dev.id))")
+            Log.account.info("Device registered: \(dev.name) (\(dev.id))")
 
             // Save device info
             let deviceData = try JSONEncoder().encode(dev)
@@ -90,19 +91,19 @@ final class AccountViewModel: ObservableObject {
 
             // Brief pause on "Ready!" before transitioning
             loginStep = .ready
-            print("[Burrow Login] Ready!")
+            Log.account.info("Ready!")
             try? await Task.sleep(for: .seconds(1))
 
             isLoggedIn = true
         } catch let providerError as VPNProviderError {
-            print("[Burrow Login] Provider error: \(providerError.errorDescription ?? "unknown")")
+            Log.account.error("Provider error: \(providerError.errorDescription ?? "unknown")")
             loginStep = .idle
             error = providerError.errorDescription
             if case .deviceLimitReached = providerError {
                 isDeviceLimitError = true
             }
         } catch {
-            print("[Burrow Login] Error: \(error)")
+            Log.account.error("Error: \(error)")
             loginStep = .idle
             self.error = error.localizedDescription
         }
@@ -116,9 +117,9 @@ final class AccountViewModel: ObservableObject {
             Task {
                 do {
                     try await provider.removeDevice(token: token, deviceID: deviceID)
-                    print("[Burrow Logout] Device \(deviceID) removed")
+                    Log.account.info("Device \(deviceID) removed")
                 } catch {
-                    print("[Burrow Logout] Failed to remove device: \(error)")
+                    Log.account.error("Failed to remove device: \(error)")
                 }
             }
         }
