@@ -12,7 +12,7 @@ struct LoginView: View {
             VStack(spacing: 12) {
                 Image(.icon)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .frame(width: 96, height: 96)
                     .accessibilityHidden(true)
                     .scaleEffect(iconBreathing ? 1.03 : 1.0)

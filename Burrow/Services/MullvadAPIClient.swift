@@ -30,7 +30,6 @@ final class MullvadAPIClient: VPNProvider, Sendable {
 
     // MARK: - Properties
 
-    // swiftlint:disable:next force_unwrapping
     private let baseURL = URL(string: "https://api.mullvad.net")!
     private let session: URLSession
     private let decoder: JSONDecoder
